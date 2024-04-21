@@ -1,4 +1,4 @@
-# E-commerce Application API
+# E-commerce Application API (Team5)
 
 This repository contains ASP.NET Core application with RESTful API endpoints for e-commerce application. The API allows you to interact with products in the store.
 
