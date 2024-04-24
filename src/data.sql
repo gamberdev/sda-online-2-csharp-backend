@@ -1,92 +1,83 @@
 CREATE DATABASE eCommerce;
 
-CREATE TABLE customer (
-  customer_id SERIAL PRIMARY KEY,
-  full_name varchar(100),
-  phone varchar(10) UNIQUE NOT NULL,
-  email varchar(50) UNIQUE NOT NULL,
-  password varchar(30),
-  role varchar(100) 
+CREATE TABLE users (
+  user_id SERIAL PRIMARY KEY,
+  full_name VARCHAR(100),
+  phone VARCHAR(10) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(30),
+  createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  role VARCHAR(100),
+  isBanned BOOLEAN DEFAULT FALSE
 );
 
 -- =======================================================================
 
 CREATE TABLE category (
-  category_id serial PRIMARY KEY,
-  type_name varchar(100) UNIQUE NOT NULL
+  category_id SERIAL PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  slug VARCHAR(100) UNIQUE NOT NULL
 );
 
 -- =======================================================================
 
 CREATE TABLE product (
   product_id SERIAL PRIMARY KEY,
-  name varchar(100) NOT NULL,
-  price decimal NOT NULL,
-  description varchar(1000),
-  category_id integer,
+  name VARCHAR(100) NOT NULL,
+  image VARCHAR(150), 
+  price NUMERIC(10, 2) NOT NULL,
+  description TEXT,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  category_id INTEGER,
   FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
 
 -- =======================================================================
 
-
 CREATE TABLE orders (
-  order_id serial PRIMARY KEY,
-  total_price decimal,
+  order_id SERIAL PRIMARY KEY,
+  total_price NUMERIC(12, 2),
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  customer_id integer,
-  FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+  payment_method VARCHAR(100),
+  order_status VARCHAR(100) DEFAULT 'pending',
+  user_id INTEGER,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- =======================================================================
 
 CREATE TABLE order_item (
-  item_id serial PRIMARY KEY,
-  quantity integer,
-  price decimal,
-  product_id integer,
-  customer_id integer,
-  order_id integer,
-  FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+  item_id SERIAL PRIMARY KEY,
+  quantity INTEGER,
+  price NUMERIC(10, 2),
+  product_id INTEGER,
+  user_id INTEGER,
+  order_id INTEGER,
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (product_id) REFERENCES product(product_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id)
-);
-
--- =======================================================================
-
-CREATE TABLE payment (
-  payment_id  serial PRIMARY KEY,
-  payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  method varchar(100),
-  order_id integer UNIQUE,
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
 -- =======================================================================
 
 CREATE TABLE shipment (
-  shipment_id serial PRIMARY KEY,
-  customer_id  integer,
-  order_id  integer,
-  shipment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  address varchar(100),
-  status varchar(50),
-  FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+  shipment_id SERIAL PRIMARY KEY,
+  user_id  INTEGER,
+  order_id  INTEGER,
+  delivery_date TIMESTAMP,
+  delivery_address VARCHAR(100),
+  shipment_status VARCHAR(100) DEFAULT 'Processing',
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
 -- =======================================================================
 
 CREATE TABLE review (
-  review_id serial PRIMARY KEY,
-  product_id integer,
-  customer_id  integer,
-  comment varchar(1000),
+  review_id SERIAL PRIMARY KEY,
+  product_id INTEGER,
+  user_id  INTEGER,
+  comment TEXT,
   FOREIGN KEY (product_id) REFERENCES product(product_id),
-  FOREIGN KEY (customer_id) REFERENCES customer(customer_id) 
+  FOREIGN KEY (user_id) REFERENCES users(user_id) 
 );
-
-
-
-
-
