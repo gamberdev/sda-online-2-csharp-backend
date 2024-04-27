@@ -6,9 +6,9 @@ CREATE TABLE users (
   phone VARCHAR(10) UNIQUE NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(30),
-  createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   role VARCHAR(100),
-  isBanned BOOLEAN DEFAULT FALSE
+  is_banned BOOLEAN DEFAULT FALSE
 );
 
 -- =======================================================================
