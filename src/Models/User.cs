@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace ecommerce.Models;
 
-     public class User
+public class User
 {
     public int UserId { get; set; }
-    public string? FullName { get; set; }
-    public string? Phone { get; set; }
-    public string? Email { get; set; }
-    public string? Password { get; set; }
-    public DateTime CreateAt { get; set; }
-    public string? Role { get; set; }
-    public bool IsBanned { get; set; }
+    public required string FullName { get; set; }
+    public required string Phone { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public string Role { get; set; } = "customer";
+    public bool IsBanned { get; set; } = false;
 
     // Navigation properties
     public List<Order>? Orders { get; set; }
