@@ -7,8 +7,7 @@ using ecommerce.Models;
 using ecommerce.Tables;
 
 public class ReviewService
-    {
-
+{
     private readonly AppDbContext _appDbContext;
 
     public ReviewService(AppDbContext appDbContext)
@@ -45,7 +44,7 @@ public class ReviewService
         _appDbContext.SaveChanges();
         return newReview;
     }
-    
+
     public async Task<Review?> UpdateReview(Guid id, ReviewModel updateReview)
     {
         await Task.CompletedTask;
@@ -58,7 +57,7 @@ public class ReviewService
         _appDbContext.SaveChanges();
         return foundReview;
     }
-   
+
     public async Task<bool> DeleteReview(Guid id)
     {
         await Task.CompletedTask;
@@ -71,6 +70,5 @@ public class ReviewService
             return true;
         }
         return false;
-    }    
-        
     }
+}
