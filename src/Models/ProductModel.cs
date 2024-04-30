@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 
 namespace ecommerce.Models;
 
-public class Product
+public class ProductModel
 {
-    public int ProductId { get; set; }
+    public Guid ProductId { get; set; }
     public required string Name { get; set; }
     public required double Price { get; set; }
     public string? Description { get; set; }
     public string Image { get; set; } = string.Empty;
 
     //Foreign Key
-    public int CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
 
     //Navigation properties
-    public Category? Category { get; set; }
-    public List<Review>? Reviews { get; set; }
-    public List<OrderItem>? OrderItems { get; set; }
+    // public CategoryModel? Category { get; set; }
+    // public List<ReviewModel>? Reviews { get; set; }
+    // public List<OrderItemModel>? OrderItems { get; set; }
 }
