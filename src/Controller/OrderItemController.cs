@@ -9,44 +9,42 @@ using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/OrderItems")]
+[Route("/orderItems")]
+public class OrderItemController : ControllerBase
+{
+    private readonly OrderItemService _orderItemService;
 
-    public class OrderItemController : ControllerBase
+    public OrderItemController(AppDbContext appDbContext)
     {
-        private readonly OrderItemService _orderItemService;
-        public OrderItemController(AppDbContext appDbContext)
-        {
-            _orderItemService = new OrderItemService(appDbContext);
-        }
+        _orderItemService = new OrderItemService(appDbContext);
+    }
 
-        [HttpGet]
-    public async Task<IActionResult> GetAllOrderItems(){
-         try
+    [HttpGet]
+    public async Task<IActionResult> GetAllOrderItems()
+    {
+        try
         {
             var orderItems = await _orderItemService.GetAllOrderItems();
             return Ok(orderItems);
         }
-
-   catch (Exception ex)
+        catch (Exception ex)
         {
             Console.Write($"An error occurred while retrieving all order items");
             return StatusCode(500, ex.Message);
         }
     }
 
-
-
-        [HttpGet("{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetOrderItemById(Guid id)
-        {
-            try
+    {
+        try
         {
             var orderItem = await _orderItemService.GetOrderItemById(id);
             if (orderItem == null)
             {
                 return NotFound();
             }
-             return Ok(orderItem);
+            return Ok(orderItem);
         }
         catch (Exception ex)
         {
@@ -55,16 +53,13 @@ using Microsoft.AspNetCore.Mvc;
         }
     }
 
-
-
-         [HttpPost]
+    [HttpPost]
     public async Task<IActionResult> AddOrderItem(OrderItemModel newOrderItem)
     {
         try
         {
-           await _orderItemService.AddOrderItem(newOrderItem);
-                  return Ok(new SuccessResponse<ReviewModel> { Message = "The OrderItem is Added" });
-
+            await _orderItemService.AddOrderItem(newOrderItem);
+            return Ok(new SuccessResponse<OrderItemModel> { Message = "The OrderItem is Added" });
         }
         catch (Exception ex)
         {
@@ -73,12 +68,10 @@ using Microsoft.AspNetCore.Mvc;
         }
     }
 
-
-
-        [HttpPut("{id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateOrderItem(Guid id, OrderItemModel updateData)
-        {
-     try
+    {
+        try
         {
             var found = await _orderItemService.UpdateOrderItem(id, updateData);
 
@@ -86,7 +79,9 @@ using Microsoft.AspNetCore.Mvc;
             {
                 return NotFound(new ErrorResponse { Message = "The OrderItem not found" });
             }
-            return Ok(new SuccessResponse<OrderItem> { Message = "Review OrderItem", Data = found });
+            return Ok(
+                new SuccessResponse<OrderItem> { Message = "Review OrderItem", Data = found }
+            );
         }
         catch (Exception)
         {
@@ -97,12 +92,12 @@ using Microsoft.AspNetCore.Mvc;
         }
     }
 
-      [HttpDelete("{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrderItem(Guid id)
     {
         try
         {
-             var deleted = await _orderItemService.DeleteOrderItem(id);
+            var deleted = await _orderItemService.DeleteOrderItem(id);
             if (!deleted)
             {
                 return NotFound(new ErrorResponse { Message = "The OrderItem not found" });
