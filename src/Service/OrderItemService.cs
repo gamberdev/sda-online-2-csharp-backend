@@ -51,13 +51,12 @@ public class OrderItemService {
         return newOrderItem;
     }
 
-
    // Update an existing order item
       public async Task<OrderItem?> UpdateOrderItem(Guid id, OrderItemModel updateOrderItem)
     {
         await Task.CompletedTask;
-        var OrderItemsDb = _appDbContext.OrderItems.ToList();
-        var foundOrderItem = OrderItemsDb.FirstOrDefault(orderItem => orderItem.OrderItemId == id);
+        var orderItemsDb = _appDbContext.OrderItems.ToList();
+        var foundOrderItem = orderItemsDb.FirstOrDefault(orderItem => orderItem.OrderItemId == id);
         if (foundOrderItem!= null)
         {
             foundOrderItem.Quantity = updateOrderItem.Quantity;

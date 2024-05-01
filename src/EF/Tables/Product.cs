@@ -21,6 +21,7 @@ namespace ecommerce.Tables
 
         [Required(ErrorMessage = "Price is required")]
         public double Price { get; set; }
+         public string Slug { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string Image { get; set; } = string.Empty;
 

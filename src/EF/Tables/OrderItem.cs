@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ecommerce.Tables;
 
-[Table("OrderItem")]
+[Table("orderItem")]
 public class OrderItem
 {
-     [Key , Required]
+    [Key, Required]
     public Guid OrderItemId { get; set; }
-   
+
     public int Quantity { get; set; }
     public double Price { get; set; }
 

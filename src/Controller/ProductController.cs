@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("/api/products")]
+    [Route("/products")]
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productService;
@@ -21,7 +21,6 @@ namespace api.Controllers
         {
             _productService = new ProductService(appDbContext);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
@@ -33,37 +32,32 @@ namespace api.Controllers
                 if (products.ToList().Count < 1)
                 {
                     return NotFound(
-                    new ErrorResponse { Success = false, Message = "No products found" }
-
+                        new ErrorResponse { Success = false, Message = "No products found" }
                     );
                 }
 
-                return Ok(new SuccessResponse<IEnumerable<Product>>
-                {
-
-                    Success = true,
-                    Message = "all products are returned successfully",
-                    Data = products
-                });
-
+                return Ok(
+                    new SuccessResponse<IEnumerable<Product>>
+                    {
+                        Success = true,
+                        Message = "All products are returned successfully",
+                        Data = products
+                    }
+                );
             }
             catch (Exception ex)
             {
-
-                Console.Write($"an error occured while retrieving all products");
+                Console.Write($"an error occurred while retrieving all products");
 
                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
-
         }
 
-
-        [HttpGet("{productId}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(Guid id)
         {
             try
             {
-
                 // return BadRequest("Invalid product ID Format");
 
                 var foundProduct = await _productService.GetProductById(id);
@@ -72,14 +66,14 @@ namespace api.Controllers
                     return NotFound(new ErrorResponse { Message = "The category not found" });
                 }
 
-                return Ok(new SuccessResponse<Product>
-                {
-
-                    Success = true,
-                    Message = "all products are returned successfully",
-                    Data = foundProduct
-                });
-
+                return Ok(
+                    new SuccessResponse<Product>
+                    {
+                        Success = true,
+                        Message = "Product is returned successfully",
+                        Data = foundProduct
+                    }
+                );
             }
             catch (Exception ex)
             {
@@ -88,32 +82,24 @@ namespace api.Controllers
             }
         }
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductModel newProduct)
         {
-
             try
             {
                 await _productService.CreateProduct(newProduct);
                 return Ok(new SuccessResponse<ProductModel> { Message = "The product is Added" });
             }
             catch (Exception ex)
-
             {
                 Console.Write($"An error occurred while creating the product");
                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
         }
 
-
-
-        [HttpPut("{productId}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
         {
-
             try
             {
                 var found = await _productService.UpdateProduct(id, updatedProduct);
@@ -121,27 +107,20 @@ namespace api.Controllers
                 {
                     return NotFound(new ErrorResponse { Message = "The product not found" });
                 }
-                return Ok(new SuccessResponse<Product> { Message = "Product updated", Data = found });
+                return Ok(
+                    new SuccessResponse<Product> { Message = "Product updated", Data = found }
+                );
             }
             catch (Exception ex)
             {
                 Console.Write($"An error occurred while updating the product");
-
-                return StatusCode(
-                    500,
-                    new ErrorResponse { Message = ex.Message }
-                );
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
-
-
         }
 
-
-
-        [HttpDelete("{productId}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
-
             try
             {
                 var deleted = await _productService.DeleteProduct(id);
@@ -153,12 +132,8 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    500,
-                    new ErrorResponse { Message = ex.Message }
-                );
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
         }
-
     }
 }

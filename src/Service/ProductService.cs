@@ -4,19 +4,19 @@ using System.Linq;
 using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
+using ecommerce.utils;
 
 // Products data
-
 namespace ecommerce.EF;
+
 public class ProductService
 {
-
     private readonly AppDbContext _appDbContext;
 
     public ProductService(AppDbContext appDbContext)
-    { _appDbContext = appDbContext; }
-
-
+    {
+        _appDbContext = appDbContext;
+    }
 
     // Get all products
     public async Task<IEnumerable<Product>> GetAllProducts()
@@ -35,7 +35,6 @@ public class ProductService
         return foundProduct;
     }
 
-
     // Create a new product
     public async Task<ProductModel> CreateProduct(ProductModel newProduct)
     {
@@ -45,17 +44,14 @@ public class ProductService
             ProductId = Guid.NewGuid(),
             Name = newProduct.Name,
             Price = newProduct.Price,
+            Slug = Function.GetSlug(newProduct.Name ?? ""),
             Description = newProduct.Description,
             Image = newProduct.Image ?? ""
-
         };
         _appDbContext.Products.Add(product);
         _appDbContext.SaveChanges();
         return newProduct;
     }
-
-
-
 
     // Update an existing product
     public async Task<Product?> UpdateProduct(Guid id, ProductModel updatedProduct)
@@ -67,9 +63,9 @@ public class ProductService
         {
             foundProduct.Name = updatedProduct.Name;
             foundProduct.Price = updatedProduct.Price;
+            foundProduct.Slug = Function.GetSlug(updatedProduct.Name ?? "");
             foundProduct.Description = updatedProduct.Description;
             foundProduct.Image = updatedProduct.Image ?? "";
-
         }
         _appDbContext.SaveChanges();
         return foundProduct;
@@ -89,9 +85,4 @@ public class ProductService
         }
         return false;
     }
-
-
 }
-
-
-
