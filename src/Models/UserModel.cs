@@ -40,6 +40,5 @@ public class UserModel
     // Navigation properties
     // public List<OrderModel>? Orders { get; set; }
     // public List<OrderItemModel>? OrderItems { get; set; }
-    // public List<ShipmentModel>? Shipments { get; set; }
     // public List<ReviewModel>? Reviews { get; set; }
 }
