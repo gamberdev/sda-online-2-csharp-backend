@@ -44,8 +44,7 @@ In this level, the application includes the following features:
 In addition to the basic requirements, the application enhances its functionality with the following features:
 
 1. Include pagination functionality to the method getting all products.
-2. Implement search functionality to allow users to search for specific products based on keywords or specific fields (e.g., by title).
-3. Add validation checks to ensure the data meets certain criteria before executing the actions.
+2. s certain criteria before executing the actions.
 
 ### Level 3: Advanced Requirements
 
