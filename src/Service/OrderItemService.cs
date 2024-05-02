@@ -47,6 +47,9 @@ public class OrderItemService
             OrderItemId = Guid.NewGuid(),
             Quantity = newOrderItem.Quantity,
             Price = newOrderItem.Price,
+            ProductId = newOrderItem.ProductId,
+            UserId = newOrderItem.UserId,
+            OrderId = newOrderItem.OrderId,
         };
         await _appDbContext.OrderItems.AddAsync(orderItem);
         await _appDbContext.SaveChangesAsync();

@@ -23,7 +23,7 @@ public class ProductModel
     public string? Image { get; set; }
 
     //Foreign Key
-    public Guid CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
 
     //Navigation properties
     public CategoryModel? Category { get; set; }

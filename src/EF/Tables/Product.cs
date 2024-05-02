@@ -32,7 +32,7 @@ namespace ecommerce.Tables
 
         //Foreign Key
         [Column("category_id")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         //Navigation properties
          public Category? Category { get; set; }

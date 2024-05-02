@@ -28,7 +28,7 @@ public class OrderItem
     public Guid UserId { get; set; }
 
     [Column("order_id")]
-    public Guid OrderId { get; set; }
+    public Guid? OrderId { get; set; }
 
     //Navigation properties
     public Product? Product { get; set; }

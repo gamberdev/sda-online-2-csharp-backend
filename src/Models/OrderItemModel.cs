@@ -18,7 +18,7 @@ public class OrderItemModel
     //Foreign Key
     public Guid ProductId { get; set; }
     public Guid UserId { get; set; }
-    public Guid OrderId { get; set; }
+    public Guid? OrderId { get; set; }
 
     //Navigation properties
     public ProductModel? Product { get; set; }

@@ -48,7 +48,8 @@ public class OrderService
             PaymentMethod = newOrder.PaymentMethod,
             OrderStatus = newOrder.OrderStatus,
             DeliveryDate = DateTime.UtcNow.AddDays(5),
-            DeliveryAddress = newOrder.DeliveryAddress ?? ""
+            DeliveryAddress = newOrder.DeliveryAddress ?? "",
+            UserId = newOrder.UserId
         };
         await _appDbContext.Orders.AddAsync(order);
         await _appDbContext.SaveChangesAsync();

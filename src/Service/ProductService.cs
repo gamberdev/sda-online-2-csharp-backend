@@ -52,7 +52,8 @@ public class ProductService
             Price = newProduct.Price,
             Slug = Function.GetSlug(newProduct.Name ?? ""),
             Description = newProduct.Description,
-            Image = newProduct.Image ?? ""
+            Image = newProduct.Image ?? "",
+            CategoryId = newProduct.CategoryId
         };
         await _appDbContext.Products.AddAsync(product);
         await _appDbContext.SaveChangesAsync();
