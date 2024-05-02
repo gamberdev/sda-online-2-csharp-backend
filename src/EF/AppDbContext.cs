@@ -23,7 +23,46 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // base.OnModelCreating(modelBuilder);
-        //
-    }
-}
+        
+base.OnModelCreating(modelBuilder);
+// Users Constraint
+modelBuilder.Entity<OrderItem>().HasKey(oi => oi.OrderItemId);
+modelBuilder.Entity<OrderItem>(). Property(oi => oi. Quantity);
+modelBuilder.Entity<OrderItem>(). Property(oi => oi. Price);
+
+
+// Relationship 
+    modelBuilder.Entity<OrderItem>()
+        .HasOne(oi => oi.Product)
+        .WithMany()
+        .HasForeignKey(oi => oi.ProductId)
+         .IsRequired(false);
+
+     modelBuilder.Entity<OrderItem>()
+         .HasOne(oi => oi.User)
+        .WithMany()
+        .HasForeignKey(oi => oi.UserId)
+         .OnDelete(DeleteBehavior.Restrict);
+
+
+     modelBuilder.Entity<OrderItem>()
+        .HasOne(oi => oi.Order)
+        .WithMany()
+         .HasForeignKey(oi => oi.OrderId)
+         .IsRequired(false);
+
+    modelBuilder.Entity<Product>().HasKey(p => p.ProductId);
+    modelBuilder.Entity<User>().HasKey(u => u. UserId);
+
+
+        modelBuilder.Entity<Product>()
+        .HasKey(oi => oi.ProductId); 
+                
+        modelBuilder.Entity<User>()
+        .HasKey(oi => oi.UserId); 
+                
+        modelBuilder.Entity<Order>()
+        .HasKey(oi => oi.OrderId);
+
+}}
+ 

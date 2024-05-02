@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Controllers;
 using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
@@ -25,12 +26,18 @@ public class OrderItemController : ControllerBase
         try
         {
             var orderItems = await _orderItemService.GetAllOrderItems();
-            return Ok(orderItems);
+
+
+            if (orderItems.Count() <= 0)
+            {
+                return ApiResponse.NotFound("There is no orderItems");
+            }
+            return ApiResponse.Success(orderItems, "All orderItems inside E-commerce system");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Console.Write($"An error occurred while retrieving all order items");
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("There is an error on getting the orderItems");
         }
     }
 
@@ -42,14 +49,14 @@ public class OrderItemController : ControllerBase
             var orderItem = await _orderItemService.GetOrderItemById(id);
             if (orderItem == null)
             {
-                return NotFound();
+                return ApiResponse.BadRequest("The orderItem not found");
             }
-            return Ok(orderItem);
+            return ApiResponse.Success(orderItem, "orderItem Detail");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Console.Write($"An error occurred while retrieving the order item");
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("There is an error on getting the orderItem");
         }
     }
 
@@ -59,12 +66,12 @@ public class OrderItemController : ControllerBase
         try
         {
             await _orderItemService.AddOrderItem(newOrderItem);
-            return Ok(new SuccessResponse<OrderItemModel> { Message = "The OrderItem is Added" });
+            return ApiResponse.Created(newOrderItem, "The OrderItem is Added");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Console.Write($"An error occurred while creating the order item");
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("Cannot add the OrderItem");
         }
     }
 
@@ -77,18 +84,16 @@ public class OrderItemController : ControllerBase
 
             if (found == null)
             {
-                return NotFound(new ErrorResponse { Message = "The OrderItem not found" });
+                return ApiResponse.NotFound("The OrderItem not found");
             }
-            return Ok(
-                new SuccessResponse<OrderItem> { Message = "Review OrderItem", Data = found }
-            );
+            return ApiResponse.Success(found, "OrderItem updated");
+
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on updating Review" }
-            );
+            return ApiResponse.ServerError("There is an error on updating OrderItem"
+
+                );
         }
     }
 
@@ -100,16 +105,15 @@ public class OrderItemController : ControllerBase
             var deleted = await _orderItemService.DeleteOrderItem(id);
             if (!deleted)
             {
-                return NotFound(new ErrorResponse { Message = "The OrderItem not found" });
+                return ApiResponse.NotFound("The OrderItem not found");
             }
-            return Ok(new SuccessResponse<bool> { Message = "OrderItem Deleted" });
+            return ApiResponse.Success("", "OrderItem Deleted");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on deleting OrderItem" }
-            );
+            return ApiResponse.ServerError("There is an error on deleting OrderItem"
+
+                );
         }
     }
 }
