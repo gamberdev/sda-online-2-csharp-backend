@@ -7,10 +7,12 @@ using ecommerce.Models;
 using ecommerce.Tables;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
-namespace api.Controllers
+
+namespace api.Controllers;
+
 [ApiController]
-[Route("/api/Orders")]
-public class OrderControllers : ControllerBase
+[Route("/orders")]
+public class OrderController : ControllerBase
 {
     private readonly OrderService _orderService;
 
@@ -18,7 +20,6 @@ public class OrderControllers : ControllerBase
     {
         _orderService = new OrderService(appDbContext);
     }
-
 
     [HttpGet]
     public async Task<IActionResult> GetAllOrders()
@@ -29,38 +30,31 @@ public class OrderControllers : ControllerBase
 
             if (orders.ToList().Count < 1)
             {
-                return NotFound(
-                new ErrorResponse { Success = false, Message = "No orders found" }
-
-                );
+                return NotFound(new ErrorResponse { Success = false, Message = "No orders found" });
             }
 
-            return Ok(new SuccessResponse<IEnumerable<Order>>
-            {
-
-                Success = true,
-                Message = "all orders are returned successfully",
-                Data = products
-            });
-
+            return Ok(
+                new SuccessResponse<IEnumerable<Order>>
+                {
+                    Success = true,
+                    Message = "all orders are returned successfully",
+                    Data = orders
+                }
+            );
         }
         catch (Exception ex)
         {
-
             Console.Write($"an error occured while retrieving all orders");
 
             return StatusCode(500, new ErrorResponse { Message = ex.Message });
         }
-
     }
-
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrder(Guid id)
     {
         try
         {
-
             // return BadRequest("Invalid order ID Format");
 
             var foundOrder = await _orderService.GetOrderById(id);
@@ -69,14 +63,14 @@ public class OrderControllers : ControllerBase
                 return NotFound(new ErrorResponse { Message = "The order not found" });
             }
 
-            return Ok(new SuccessResponse<Product>
-            {
-
-                Success = true,
-                Message = "all order are returned successfully",
-                Data = foundOrder
-            });
-
+            return Ok(
+                new SuccessResponse<Order>
+                {
+                    Success = true,
+                    Message = "all order are returned successfully",
+                    Data = foundOrder
+                }
+            );
         }
         catch (Exception ex)
         {
@@ -85,32 +79,24 @@ public class OrderControllers : ControllerBase
         }
     }
 
-
-
-
     [HttpPost]
     public async Task<IActionResult> CreateOrder(OrderModel newOrder)
     {
-
         try
         {
             await _orderService.CreateOrder(newOrder);
             return Ok(new SuccessResponse<OrderModel> { Message = "The order is Added" });
         }
         catch (Exception ex)
-
         {
             Console.Write($"An error occurred while creating the product");
             return StatusCode(500, new ErrorResponse { Message = ex.Message });
         }
     }
 
-
-
-    [HttpPut("{orderId}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateOrder(Guid id, OrderModel updatedOrder)
     {
-
         try
         {
             var found = await _orderService.UpdateOrder(id, updatedOrder);
@@ -124,21 +110,13 @@ public class OrderControllers : ControllerBase
         {
             Console.Write($"An error occurred while updating the Order");
 
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = ex.Message }
-            );
+            return StatusCode(500, new ErrorResponse { Message = ex.Message });
         }
-
-
     }
 
-
-
-    [HttpDelete("{orderId}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrder(Guid id)
     {
-
         try
         {
             var deleted = await _orderService.DeleteOrder(id);
@@ -150,11 +128,7 @@ public class OrderControllers : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = ex.Message }
-            );
+            return StatusCode(500, new ErrorResponse { Message = ex.Message });
         }
     }
-
 }

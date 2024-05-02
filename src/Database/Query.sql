@@ -57,8 +57,8 @@ WHERE p.product_id = 5;
 SELECT * FROM order_item;
 
 -- insert into orders
-INSERT INTO orders (total_price, payment_method, user_id)
-SELECT SUM(i.price),'cash',1
+INSERT INTO orders (total_price, payment_method, user_id, delivery_date,delivery_address)
+SELECT SUM(i.price),'cash',1, CURRENT_TIMESTAMP + INTERVAL '5 days','Riyadh 6787 554jh'
 FROM order_item i
 WHERE i.user_id = 1 AND i.order_id IS NULL;
 
@@ -70,16 +70,6 @@ FROM orders
 WHERE user_id = 1
 ORDER BY order_date DESC
 LIMIT 1) where order_id IS NULL;
-
--- Then, insert shipment
-INSERT INTO shipment (user_id, order_id, delivery_date, delivery_address) 
-SELECT o.user_id, o.order_id, o.order_date + INTERVAL '5 days', 'Riyadh 6787 554jh'
-FROM orders o
-WHERE o.user_id = 1 AND NOT EXISTS(SELECT * from shipment s WHERE s.order_id = o.order_id )
-ORDER BY o.order_date DESC
-LIMIT 1;
-
-SELECT * FROM shipment;
 
 -- insert review
 INSERT INTO review (product_id, user_id, comment) VALUES (1, 1, 'The product work fine');

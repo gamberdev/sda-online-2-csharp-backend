@@ -38,6 +38,8 @@ CREATE TABLE orders (
   order_id SERIAL PRIMARY KEY,
   total_price NUMERIC(12, 2),
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  delivery_date TIMESTAMP,
+  delivery_address VARCHAR(100)
   payment_method VARCHAR(100),
   order_status VARCHAR(100) DEFAULT 'pending',
   user_id INTEGER,
@@ -55,19 +57,6 @@ CREATE TABLE order_item (
   order_id INTEGER,
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (product_id) REFERENCES product(product_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id)
-);
-
--- =======================================================================
-
-CREATE TABLE shipment (
-  shipment_id SERIAL PRIMARY KEY,
-  user_id  INTEGER,
-  order_id  INTEGER,
-  delivery_date TIMESTAMP,
-  delivery_address VARCHAR(100),
-  shipment_status VARCHAR(100) DEFAULT 'Processing',
-  FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
