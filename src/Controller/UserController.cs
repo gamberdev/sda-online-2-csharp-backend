@@ -1,8 +1,8 @@
+using api.Controllers;
 using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("/users")]
@@ -23,22 +23,13 @@ public class UserController : ControllerBase
             var users = await _userService.GetUsers();
             if (users.Count() <= 0)
             {
-                return NotFound(new ErrorResponse { Message = "There is no users" });
+                return ApiResponse.NotFound("There is no users");
             }
-            return Ok(
-                new SuccessResponse<IEnumerable<User>>
-                {
-                    Message = "All users inside E-commerce system",
-                    Data = users
-                }
-            );
+            return ApiResponse.Success(users, "All users inside E-commerce system");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the users" }
-            );
+            return ApiResponse.ServerError("There is an error on getting the users");
         }
     }
 
@@ -50,16 +41,13 @@ public class UserController : ControllerBase
             var found = await _userService.GetUserById(id);
             if (found == null)
             {
-                return BadRequest(new ErrorResponse { Message = "The user not found" });
+                return ApiResponse.BadRequest("The user not found");
             }
-            return Ok(new SuccessResponse<User> { Message = "User Detail", Data = found });
+            return ApiResponse.Success(found, "User Detail");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the user" }
-            );
+            return ApiResponse.ServerError("There is an error on getting the user");
         }
     }
 
@@ -69,12 +57,16 @@ public class UserController : ControllerBase
         try
         {
             await _userService.AddUser(newUser);
-            // return CreatedAtAction(nameof(GetUserById), new { id = newUser.UserId }, newUser);
-            return Ok(new SuccessResponse<UserModel> { Message = "The user is Added" });
+            return ApiResponse.Created(newUser, "The user is Added");
         }
-        catch (Exception)
+        catch (DbUpdateException ex)
+            when (ex.InnerException is Npgsql.PostgresException postgresException)
         {
-            return StatusCode(500, new ErrorResponse { Message = "Cannot add the user" });
+            if (postgresException.SqlState == "23505")
+            {
+                return ApiResponse.Conflict("Duplicate email. User with email already exists");
+            }
+            return ApiResponse.ServerError("Cannot add the user");
         }
     }
 
@@ -86,16 +78,13 @@ public class UserController : ControllerBase
             var found = await _userService.UpdateUser(id, updateData);
             if (found == null)
             {
-                return NotFound(new ErrorResponse { Message = "The user not found" });
+                return ApiResponse.NotFound("The user not found");
             }
-            return Ok(new SuccessResponse<User> { Message = "User updated", Data = found });
+            return ApiResponse.Success(found, "User updated");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on updating user" }
-            );
+            return ApiResponse.ServerError("There is an error on updating user");
         }
     }
 
@@ -107,16 +96,13 @@ public class UserController : ControllerBase
             var deleted = await _userService.DeleteUser(id);
             if (!deleted)
             {
-                return NotFound(new ErrorResponse { Message = "The user not found" });
+                return ApiResponse.NotFound("The user not found");
             }
-            return Ok(new SuccessResponse<bool> { Message = "User Deleted" });
+            return ApiResponse.Success(id, "User Deleted");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on deleting user" }
-            );
+            return ApiResponse.ServerError("There is an error on deleting user");
         }
     }
 }

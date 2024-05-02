@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ecommerce.Models;
 using ecommerce.Tables;
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.EF;
 
@@ -19,24 +20,26 @@ public class OrderService
     // Get all orders
     public async Task<IEnumerable<Order>> GetAllOrders()
     {
-        await Task.CompletedTask;
-        var orders = _appDbContext.Orders.ToList();
+        var orders = await _appDbContext
+            .Orders.Include(u => u.User)
+            .Include(item => item.OrderItems)
+            .ToListAsync();
         return orders;
     }
 
     // Get order by ID
     public async Task<Order?> GetOrderById(Guid id)
     {
-        await Task.CompletedTask;
-        var OrdersDb = _appDbContext.Orders.ToList();
-        var foundOrder = OrdersDb.FirstOrDefault(order => order.OrderId == id);
+        var foundOrder = await _appDbContext
+            .Orders.Include(u => u.User)
+            .Include(item => item.OrderItems)
+            .FirstOrDefaultAsync(order => order.OrderId == id);
         return foundOrder;
     }
 
     // Create a new Order
     public async Task<OrderModel> CreateOrder(OrderModel newOrder)
     {
-        await Task.CompletedTask;
         Order order = new Order
         {
             OrderId = Guid.NewGuid(),
@@ -47,17 +50,15 @@ public class OrderService
             DeliveryDate = DateTime.UtcNow.AddDays(5),
             DeliveryAddress = newOrder.DeliveryAddress ?? ""
         };
-        _appDbContext.Orders.Add(order);
-        _appDbContext.SaveChanges();
+        await _appDbContext.Orders.AddAsync(order);
+        await _appDbContext.SaveChangesAsync();
         return newOrder;
     }
 
     // Update an existing order
     public async Task<Order?> UpdateOrder(Guid id, OrderModel updatedOrder)
     {
-        await Task.CompletedTask;
-        var orderDb = _appDbContext.Orders.ToList();
-        var foundOrder = orderDb.FirstOrDefault(order => order.OrderId == id);
+        var foundOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == id);
         if (foundOrder != null)
         {
             foundOrder.TotalPrice = updatedOrder.TotalPrice;
@@ -65,7 +66,7 @@ public class OrderService
             foundOrder.OrderStatus = updatedOrder.OrderStatus;
             foundOrder.DeliveryAddress = updatedOrder.DeliveryAddress ?? foundOrder.DeliveryAddress;
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundOrder;
     }
 
@@ -73,12 +74,11 @@ public class OrderService
     public async Task<bool> DeleteOrder(Guid id)
     {
         await Task.CompletedTask;
-        var orderDb = _appDbContext.Orders.ToList();
-        var foundOrder = orderDb.FirstOrDefault(order => order.OrderId == id);
+        var foundOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == id);
         if (foundOrder != null)
         {
             _appDbContext.Orders.Remove(foundOrder);
-            _appDbContext.SaveChanges();
+           await  _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

@@ -38,7 +38,7 @@ public class UserModel
     public bool IsBanned { get; set; } = false;
 
     // Navigation properties
-    // public List<OrderModel>? Orders { get; set; }
-    // public List<OrderItemModel>? OrderItems { get; set; }
-    // public List<ReviewModel>? Reviews { get; set; }
+    public ICollection<OrderModel>? Orders { get; set; }
+    public ICollection<OrderItemModel>? OrderItems { get; set; }
+    public ICollection<ReviewModel>? Reviews { get; set; }
 }

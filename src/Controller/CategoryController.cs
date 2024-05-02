@@ -1,3 +1,4 @@
+using api.Controllers;
 using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
@@ -26,14 +27,14 @@ public class CategoryController : ControllerBase
                 return ApiResponse.NotFound("There is no categories found");
             }
 
-            return ApiResponse.Success(categories, "All categories inside E-commerce system are returned");
-
+            return ApiResponse.Success(
+                categories,
+                "All categories inside E-commerce system are returned"
+            );
         }
         catch (Exception ex)
         {
-
             return ApiResponse.ServerError(ex.Message);
-
         }
     }
 
@@ -46,16 +47,13 @@ public class CategoryController : ControllerBase
             if (foundCategory == null)
             {
                 return ApiResponse.NotFound("There is no category found matching");
-
             }
 
             return ApiResponse.Success(foundCategory, "Category are returned successfully");
-
         }
         catch (Exception ex)
         {
             return ApiResponse.ServerError(ex.Message);
-
         }
     }
 
@@ -84,12 +82,10 @@ public class CategoryController : ControllerBase
                 return ApiResponse.NotFound("The category not found");
             }
             return ApiResponse.Success(found, "Category are updated successfully");
-
         }
         catch (Exception ex)
         {
             return ApiResponse.ServerError(ex.Message);
-
         }
     }
 
@@ -101,17 +97,13 @@ public class CategoryController : ControllerBase
             var deleted = await _categoryService.DeleteCategory(id);
             if (!deleted)
             {
-                return NotFound(new ErrorResponse { Message = "The category not found" });
-
+                return ApiResponse.NotFound("The category not found");
             }
-            return ApiResponse.Success("Category are Deleted successfully");
-
+            return ApiResponse.Success(id, "Category are Deleted successfully");
         }
         catch (Exception ex)
         {
             return ApiResponse.ServerError(ex.Message);
-
         }
-
     }
 }

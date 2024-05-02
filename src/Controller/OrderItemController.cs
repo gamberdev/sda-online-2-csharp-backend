@@ -27,7 +27,6 @@ public class OrderItemController : ControllerBase
         {
             var orderItems = await _orderItemService.GetAllOrderItems();
 
-
             if (orderItems.Count() <= 0)
             {
                 return ApiResponse.NotFound("There is no orderItems");
@@ -36,7 +35,7 @@ public class OrderItemController : ControllerBase
         }
         catch (Exception)
         {
-            Console.Write($"An error occurred while retrieving all order items");
+            Console.Write($"An error occurred while retrieving all orderItems");
             return ApiResponse.ServerError("There is an error on getting the orderItems");
         }
     }
@@ -55,7 +54,7 @@ public class OrderItemController : ControllerBase
         }
         catch (Exception)
         {
-            Console.Write($"An error occurred while retrieving the order item");
+            Console.Write($"An error occurred while retrieving the orderItem");
             return ApiResponse.ServerError("There is an error on getting the orderItem");
         }
     }
@@ -70,7 +69,7 @@ public class OrderItemController : ControllerBase
         }
         catch (Exception)
         {
-            Console.Write($"An error occurred while creating the order item");
+            Console.Write($"An error occurred while creating the orderItem");
             return ApiResponse.ServerError("Cannot add the OrderItem");
         }
     }
@@ -81,19 +80,15 @@ public class OrderItemController : ControllerBase
         try
         {
             var found = await _orderItemService.UpdateOrderItem(id, updateData);
-
             if (found == null)
             {
                 return ApiResponse.NotFound("The OrderItem not found");
             }
             return ApiResponse.Success(found, "OrderItem updated");
-
         }
         catch (Exception)
         {
-            return ApiResponse.ServerError("There is an error on updating OrderItem"
-
-                );
+            return ApiResponse.ServerError("There is an error on updating OrderItem");
         }
     }
 
@@ -107,13 +102,11 @@ public class OrderItemController : ControllerBase
             {
                 return ApiResponse.NotFound("The OrderItem not found");
             }
-            return ApiResponse.Success("", "OrderItem Deleted");
+            return ApiResponse.Success(id, "OrderItem Deleted");
         }
         catch (Exception)
         {
-            return ApiResponse.ServerError("There is an error on deleting OrderItem"
-
-                );
+            return ApiResponse.ServerError("There is an error on deleting OrderItem");
         }
     }
 }

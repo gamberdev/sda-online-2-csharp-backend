@@ -36,6 +36,6 @@ public class OrderModel
     public Guid UserId { get; set; }
 
     // Navigation properties
-    // public UserModel? User { get; set; }
-    // public List<OrderItemModel>? OrderItems { get; set; }
+    public UserModel? User { get; set; }
+    public ICollection<OrderItemModel>? OrderItems { get; set; }
 }

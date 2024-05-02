@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Controllers;
 using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
@@ -29,22 +30,13 @@ public class ReviewController : ControllerBase
             var reviews = await _reviewService.GetReviews();
             if (reviews.Count() <= 0)
             {
-                return NotFound(new ErrorResponse { Message = "There is no Reviews" });
+                return ApiResponse.NotFound("There is no Reviews");
             }
-            return Ok(
-                new SuccessResponse<IEnumerable<Review>>
-                {
-                    Message = "All Reviews inside E-commerce system",
-                    Data = reviews
-                }
-            );
+            return ApiResponse.Success(reviews, "All Reviews inside E-commerce system");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the Reviews" }
-            );
+            return ApiResponse.ServerError("There is an error on getting the Reviews");
         }
     }
 
@@ -56,18 +48,13 @@ public class ReviewController : ControllerBase
             var foundReview = await _reviewService.GetReviewById(id);
             if (foundReview == null)
             {
-                return BadRequest(new ErrorResponse { Message = "The Review not found" });
+                return ApiResponse.BadRequest("The Review not found");
             }
-            return Ok(
-                new SuccessResponse<Review> { Message = "Review Detail", Data = foundReview }
-            );
+            return ApiResponse.Success(foundReview, "Review Detail");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the Review" }
-            );
+            return ApiResponse.ServerError("There is an error on getting the Review");
         }
     }
 
@@ -77,11 +64,11 @@ public class ReviewController : ControllerBase
         try
         {
             await _reviewService.AddReview(newReview);
-            return Ok(new SuccessResponse<ReviewModel> { Message = "The Review is Added" });
+            return ApiResponse.Created(newReview,"The Review is Added");
         }
         catch (Exception)
         {
-            return StatusCode(500, new ErrorResponse { Message = "Cannot add the Review" });
+            return ApiResponse.ServerError("Cannot add the Review");
         }
     }
 
@@ -93,16 +80,13 @@ public class ReviewController : ControllerBase
             var found = await _reviewService.UpdateReview(id, updateData);
             if (found == null)
             {
-                return NotFound(new ErrorResponse { Message = "The Review not found" });
+                return ApiResponse.NotFound("The Review not found");
             }
-            return Ok(new SuccessResponse<Review> { Message = "Review updated", Data = found });
+            return ApiResponse.Success(found, "Review updated");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on updating Review" }
-            );
+            return ApiResponse.ServerError("There is an error on updating Review");
         }
     }
 
@@ -114,16 +98,13 @@ public class ReviewController : ControllerBase
             var deleted = await _reviewService.DeleteReview(id);
             if (!deleted)
             {
-                return NotFound(new ErrorResponse { Message = "The Review not found" });
+                return ApiResponse.NotFound("The Review not found");
             }
-            return Ok(new SuccessResponse<bool> { Message = "Review Deleted" });
+            return ApiResponse.Success(id,"Review Deleted");
         }
         catch (Exception)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on deleting Review" }
-            );
+            return ApiResponse.ServerError("There is an error on deleting Review");
         }
     }
 }

@@ -1,7 +1,7 @@
 CREATE DATABASE eCommerce;
 
 CREATE TABLE users (
-  user_id SERIAL PRIMARY KEY,
+  user_id UUid PRIMARY KEY,
   full_name VARCHAR(100),
   phone VARCHAR(10) UNIQUE NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE users (
 -- =======================================================================
 
 CREATE TABLE category (
-  category_id SERIAL PRIMARY KEY,
+  category_id UUid PRIMARY KEY,
   name VARCHAR(100) UNIQUE NOT NULL,
   slug VARCHAR(100) UNIQUE NOT NULL
 );
@@ -22,39 +22,39 @@ CREATE TABLE category (
 -- =======================================================================
 
 CREATE TABLE product (
-  product_id SERIAL PRIMARY KEY,
+  product_id UUid PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   image VARCHAR(150), 
   price NUMERIC(10, 2) NOT NULL,
   description TEXT,
   slug VARCHAR(100) UNIQUE NOT NULL,
-  category_id INTEGER,
+  category_id UUid,
   FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
 
 -- =======================================================================
 
 CREATE TABLE orders (
-  order_id SERIAL PRIMARY KEY,
+  order_id UUid PRIMARY KEY,
   total_price NUMERIC(12, 2),
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   delivery_date TIMESTAMP,
   delivery_address VARCHAR(100)
   payment_method VARCHAR(100),
   order_status VARCHAR(100) DEFAULT 'pending',
-  user_id INTEGER,
+  user_id UUid,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- =======================================================================
 
 CREATE TABLE order_item (
-  item_id SERIAL PRIMARY KEY,
+  item_id UUid PRIMARY KEY,
   quantity INTEGER,
   price NUMERIC(10, 2),
-  product_id INTEGER,
-  user_id INTEGER,
-  order_id INTEGER,
+  product_id UUid,
+  user_id UUid,
+  order_id UUid,
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (product_id) REFERENCES product(product_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
@@ -64,8 +64,8 @@ CREATE TABLE order_item (
 
 CREATE TABLE review (
   review_id SERIAL PRIMARY KEY,
-  product_id INTEGER,
-  user_id  INTEGER,
+  product_id UUid,
+  user_id  UUid,
   comment TEXT,
   FOREIGN KEY (product_id) REFERENCES product(product_id),
   FOREIGN KEY (user_id) REFERENCES users(user_id) 

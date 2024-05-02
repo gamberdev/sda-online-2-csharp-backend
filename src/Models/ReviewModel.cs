@@ -15,6 +15,6 @@ public class ReviewModel
     public Guid UserId { get; set; }
 
     //Navigation properties
-    // public List<ProductModel>? Products { get; set; }
-    // public List<UserModel>? Users { get; set; }
+    public ProductModel? Product { get; set; }
+    public UserModel? User { get; set; }
 }

@@ -6,6 +6,7 @@ using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
 using ecommerce.utils;
+using Microsoft.EntityFrameworkCore;
 
 public class CategoryService
 {
@@ -18,56 +19,51 @@ public class CategoryService
 
     public async Task<IEnumerable<Category>> GetCategories()
     {
-        await Task.CompletedTask;
-        var categories = _appDbContext.Categories.ToList();
+        var categories = await _appDbContext.Categories.Include(p => p.Product).ToListAsync();
         return categories;
     }
 
     public async Task<Category?> GetCategoryById(Guid id)
     {
-        await Task.CompletedTask;
-        var categoriesDb = _appDbContext.Categories.ToList();
-        var foundCategory = categoriesDb.FirstOrDefault(category => category.CategoryId == id);
+        var foundCategory = await _appDbContext
+            .Categories.Include(p => p.Product)
+            .FirstOrDefaultAsync(category => category.CategoryId == id);
         return foundCategory;
     }
 
     public async Task<CategoryModel> AddCategory(CategoryModel newCategory)
     {
-        await Task.CompletedTask;
         Category category = new Category
         {
             CategoryId = Guid.NewGuid(),
             Name = newCategory.Name,
             Slug = Function.GetSlug(newCategory.Name ?? "")
         };
-        _appDbContext.Categories.Add(category);
-        _appDbContext.SaveChanges();
+        await _appDbContext.Categories.AddAsync(category);
+        await _appDbContext.SaveChangesAsync();
         return newCategory;
     }
 
     public async Task<Category?> UpdateCategoryName(Guid id, CategoryModel updateCategory)
     {
-        await Task.CompletedTask;
-        var categoriesDb = _appDbContext.Categories.ToList();
-        var foundCategory = categoriesDb.FirstOrDefault(category => category.CategoryId == id);
+        var foundCategory = await _appDbContext.Categories.FirstOrDefaultAsync(category => category.CategoryId == id);
         if (foundCategory != null)
         {
             foundCategory.Name = updateCategory.Name;
             foundCategory.Slug = Function.GetSlug(updateCategory.Name ?? "");
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundCategory;
     }
 
     public async Task<bool> DeleteCategory(Guid id)
     {
         await Task.CompletedTask;
-        var categoryDb = _appDbContext.Categories.ToList();
-        var foundCategory = categoryDb.FirstOrDefault(category => category.CategoryId == id);
+        var foundCategory = await _appDbContext.Categories.FirstOrDefaultAsync(category => category.CategoryId == id);
         if (foundCategory != null)
         {
             _appDbContext.Categories.Remove(foundCategory);
-            _appDbContext.SaveChanges();
+            await _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

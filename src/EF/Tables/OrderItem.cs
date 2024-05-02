@@ -8,22 +8,30 @@ using ecommerce.EF;
 
 namespace ecommerce.Tables;
 
-[Table("orderItem")]
+[Table("order_item")]
 public class OrderItem
 {
-    [Key, Required]
+    [Column("orderItem_id")]
     public Guid OrderItemId { get; set; }
 
+    [Column("quantity")]
     public int Quantity { get; set; }
+
+    [Column("price")]
     public double Price { get; set; }
 
     //Foreign Key
+    [Column("product_id")]
     public Guid ProductId { get; set; }
+
+    [Column("user_id")]
     public Guid UserId { get; set; }
+
+    [Column("order_id")]
     public Guid OrderId { get; set; }
 
     //Navigation properties
-   public Product? Product { get; set; }
-     public Order? Order { get; set; }
-     public User? User { get; set; }
+    public Product? Product { get; set; }
+    public Order? Order { get; set; }
+    public User? User { get; set; }
 }

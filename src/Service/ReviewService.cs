@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
+using Microsoft.EntityFrameworkCore;
 
 public class ReviewService
 {
@@ -17,22 +18,24 @@ public class ReviewService
 
     public async Task<IEnumerable<Review>> GetReviews()
     {
-        await Task.CompletedTask;
-        var reviews = _appDbContext.Reviews.ToList();
+        var reviews = await _appDbContext
+            .Reviews.Include(u => u.User)
+            .Include(p => p.Product)
+            .ToListAsync();
         return reviews;
     }
 
     public async Task<Review?> GetReviewById(Guid id)
     {
-        await Task.CompletedTask;
-        var reviewsDb = _appDbContext.Reviews.ToList();
-        var foundReview = reviewsDb.FirstOrDefault(review => review.ReviewId == id);
+        var foundReview = await _appDbContext
+            .Reviews.Include(u => u.User)
+            .Include(p => p.Product)
+            .FirstOrDefaultAsync(review => review.ReviewId == id);
         return foundReview;
     }
 
     public async Task<ReviewModel> AddReview(ReviewModel newReview)
     {
-        await Task.CompletedTask;
         Review review = new Review
         {
             ReviewId = Guid.NewGuid(),
@@ -40,33 +43,32 @@ public class ReviewService
             ProductId = newReview.ProductId,
             UserId = newReview.UserId
         };
-        _appDbContext.Reviews.Add(review);
-        _appDbContext.SaveChanges();
+        await _appDbContext.Reviews.AddAsync(review);
+        await _appDbContext.SaveChangesAsync();
         return newReview;
     }
 
     public async Task<Review?> UpdateReview(Guid id, ReviewModel updateReview)
     {
-        await Task.CompletedTask;
-        var reviewsDb = _appDbContext.Reviews.ToList();
+        var reviewsDb = await _appDbContext.Reviews.ToListAsync();
         var foundReview = reviewsDb.FirstOrDefault(review => review.ReviewId == id);
         if (foundReview != null)
         {
             foundReview.Comment = updateReview.Comment;
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundReview;
     }
 
     public async Task<bool> DeleteReview(Guid id)
     {
         await Task.CompletedTask;
-        var ReviewDb = _appDbContext.Reviews.ToList();
+        var ReviewDb = await _appDbContext.Reviews.ToListAsync();
         var foundReview = ReviewDb.FirstOrDefault(review => review.ReviewId == id);
         if (foundReview != null)
         {
             _appDbContext.Reviews.Remove(foundReview);
-            _appDbContext.SaveChanges();
+            await _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

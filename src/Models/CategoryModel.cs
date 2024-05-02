@@ -16,5 +16,5 @@ public class CategoryModel
     public string Slug { get; set; } = string.Empty;
 
     // Navigation properties
-    // public List<ProductModel>? Products { get; set; }
+    public ICollection<ProductModel>? Products { get; set; }
 }

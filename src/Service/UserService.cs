@@ -1,5 +1,6 @@
 using ecommerce.EF;
 using ecommerce.Models;
+using ecommerce.Tables;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,22 +15,26 @@ public class UserService
 
     public async Task<IEnumerable<User>> GetUsers()
     {
-        await Task.CompletedTask;
-        var users = _appDbContext.Users.ToList();
+        var users = await _appDbContext
+            .Users.Include(u => u.Reviews)
+            .Include(u => u.Orders)
+            .Include(u => u.OrderItems)
+            .ToListAsync();
         return users;
     }
 
     public async Task<User?> GetUserById(Guid id)
     {
-        await Task.CompletedTask;
-        var usersDb = _appDbContext.Users.ToList();
-        var foundUser = usersDb.FirstOrDefault(user => user.UserId == id);
+        var foundUser = await _appDbContext
+            .Users.Include(u => u.Reviews)
+            .Include(u => u.Orders)
+            .Include(u => u.OrderItems)
+            .FirstOrDefaultAsync(user => user.UserId == id);
         return foundUser;
     }
 
     public async Task<UserModel> AddUser(UserModel newUser)
     {
-        await Task.CompletedTask;
         User user = new User
         {
             UserId = Guid.NewGuid(),
@@ -37,18 +42,16 @@ public class UserService
             Email = newUser.Email,
             Phone = newUser.Phone,
             Password = newUser.Password,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
         };
-        _appDbContext.Users.Add(user);
-        _appDbContext.SaveChanges();
+        await _appDbContext.Users.AddAsync(user);
+        await _appDbContext.SaveChangesAsync();
         return newUser;
     }
 
     public async Task<User?> UpdateUser(Guid id, UserModel updateUser)
     {
-        await Task.CompletedTask;
-        var usersDb = _appDbContext.Users.ToList();
-        var foundUser = usersDb.FirstOrDefault(user => user.UserId == id);
+        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
         if (foundUser != null)
         {
             foundUser.FullName = updateUser.FullName ?? foundUser.FullName;
@@ -56,19 +59,18 @@ public class UserService
             foundUser.Phone = updateUser.Phone ?? foundUser.Phone;
             foundUser.Password = updateUser.Password ?? foundUser.Password;
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundUser;
     }
 
     public async Task<bool> DeleteUser(Guid id)
     {
         await Task.CompletedTask;
-        var usersDb = _appDbContext.Users.ToList();
-        var foundUser = usersDb.FirstOrDefault(user => user.UserId == id);
+        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
         if (foundUser != null)
         {
             _appDbContext.Users.Remove(foundUser);
-            _appDbContext.SaveChanges();
+            await _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

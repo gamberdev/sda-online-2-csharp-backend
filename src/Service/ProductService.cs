@@ -5,6 +5,7 @@ using ecommerce.EF;
 using ecommerce.Models;
 using ecommerce.Tables;
 using ecommerce.utils;
+using Microsoft.EntityFrameworkCore;
 
 // Products data
 namespace ecommerce.EF;
@@ -21,24 +22,29 @@ public class ProductService
     // Get all products
     public async Task<IEnumerable<Product>> GetAllProducts()
     {
-        await Task.CompletedTask;
-        var products = _appDbContext.Products.ToList();
+        var products = await _appDbContext
+            .Products.Include(c => c.Category)
+            .Include(r => r.Reviews)
+            .Include(i => i.OrderItems)
+            .ToListAsync();
         return products;
     }
 
     // Get product by ID
     public async Task<Product?> GetProductById(Guid id)
     {
-        await Task.CompletedTask;
         var ProductsDb = _appDbContext.Products.ToList();
-        var foundProduct = ProductsDb.FirstOrDefault(product => product.ProductId == id);
+        var foundProduct = await _appDbContext
+            .Products.Include(c => c.Category)
+            .Include(r => r.Reviews)
+            .Include(i => i.OrderItems)
+            .FirstOrDefaultAsync(product => product.ProductId == id);
         return foundProduct;
     }
 
     // Create a new product
     public async Task<ProductModel> CreateProduct(ProductModel newProduct)
     {
-        await Task.CompletedTask;
         Product product = new Product
         {
             ProductId = Guid.NewGuid(),
@@ -48,17 +54,17 @@ public class ProductService
             Description = newProduct.Description,
             Image = newProduct.Image ?? ""
         };
-        _appDbContext.Products.Add(product);
-        _appDbContext.SaveChanges();
+        await _appDbContext.Products.AddAsync(product);
+        await _appDbContext.SaveChangesAsync();
         return newProduct;
     }
 
     // Update an existing product
     public async Task<Product?> UpdateProduct(Guid id, ProductModel updatedProduct)
     {
-        await Task.CompletedTask;
-        var ProductsDb = _appDbContext.Products.ToList();
-        var foundProduct = ProductsDb.FirstOrDefault(product => product.ProductId == id);
+        var foundProduct = await _appDbContext.Products.FirstOrDefaultAsync(product =>
+            product.ProductId == id
+        );
         if (foundProduct != null)
         {
             foundProduct.Name = updatedProduct.Name;
@@ -67,7 +73,7 @@ public class ProductService
             foundProduct.Description = updatedProduct.Description;
             foundProduct.Image = updatedProduct.Image ?? "";
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundProduct;
     }
 
@@ -75,12 +81,13 @@ public class ProductService
     public async Task<bool> DeleteProduct(Guid id)
     {
         await Task.CompletedTask;
-        var productDb = _appDbContext.Products.ToList();
-        var foundProduct = productDb.FirstOrDefault(product => product.ProductId == id);
+        var foundProduct = await _appDbContext.Products.FirstOrDefaultAsync(product =>
+            product.ProductId == id
+        );
         if (foundProduct != null)
         {
             _appDbContext.Products.Remove(foundProduct);
-            _appDbContext.SaveChanges();
+            await _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

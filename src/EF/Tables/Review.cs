@@ -4,17 +4,16 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce.EF;
 
 namespace ecommerce.Tables;
 
 [Table("review")]
 public class Review
 {
-    [Key, Required]
     [Column("review_id")]
     public Guid ReviewId { get; set; }
 
-    [Required]
     [MinLength(5)]
     [Column("comment")]
     public string? Comment { get; set; }
@@ -27,7 +26,6 @@ public class Review
     public Guid UserId { get; set; }
 
     //Navigation properties
-    // public List<ProductModel>? Products { get; set; }
-    // [ForeignKey("UserId")]
-    // public ICollection<User>? Users { get; set; }
+    public Product? Product { get; set; }
+    public User? User { get; set; }
 }

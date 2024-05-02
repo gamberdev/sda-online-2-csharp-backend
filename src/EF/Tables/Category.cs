@@ -10,7 +10,6 @@ namespace ecommerce.Tables;
 [Table("category")]
 public class Category
 {
-    [Key, Required]
     [Column("category_id")]
     public Guid CategoryId { get; set; }
 
@@ -22,6 +21,5 @@ public class Category
     [Column("slug")]
     public string Slug { get; set; } = string.Empty;
 
-    public List<Product>? Product { get; set; }
-
+    public ICollection<Product>? Product { get; set; }
 }

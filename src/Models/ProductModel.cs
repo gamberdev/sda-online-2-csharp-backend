@@ -26,7 +26,7 @@ public class ProductModel
     public Guid CategoryId { get; set; }
 
     //Navigation properties
-    // public CategoryModel? Category { get; set; }
-    // public List<ReviewModel>? Reviews { get; set; }
-    // public List<OrderItemModel>? OrderItems { get; set; }
+    public CategoryModel? Category { get; set; }
+    public ICollection<ReviewModel>? Reviews { get; set; }
+    public ICollection<OrderItemModel>? OrderItems { get; set; }
 }
