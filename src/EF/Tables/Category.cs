@@ -21,4 +21,7 @@ public class Category
 
     [Column("slug")]
     public string Slug { get; set; } = string.Empty;
+
+    public List<Product>? Product { get; set; }
+
 }

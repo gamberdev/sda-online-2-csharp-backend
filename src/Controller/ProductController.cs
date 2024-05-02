@@ -22,105 +22,112 @@ namespace api.Controllers
             _productService = new ProductService(appDbContext);
         }
 
+
+
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] int page = 1, [FromQuery] int limit = 2)
         {
             try
             {
+
                 var products = await _productService.GetAllProducts();
-
-                if (products.ToList().Count < 1)
+                if (products.Count() <= 0)
                 {
-                    return NotFound(
-                        new ErrorResponse { Success = false, Message = "No products found" }
-                    );
-                }
+                    return ApiResponse.NotFound("There is no products found");
 
-                return Ok(
-                    new SuccessResponse<IEnumerable<Product>>
-                    {
-                        Success = true,
-                        Message = "All products are returned successfully",
-                        Data = products
-                    }
-                );
+                }
+                var pagination = products.Skip((page - 1) * limit).Take(limit).ToList();
+
+                return ApiResponse.Success(pagination, "All products inside E-commerce system are returned");
+
             }
             catch (Exception ex)
             {
-                Console.Write($"an error occurred while retrieving all products");
 
-                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
+
             }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProduct(Guid id)
+        public async Task<IActionResult> GetProductById(Guid id)
         {
             try
             {
+
                 // return BadRequest("Invalid product ID Format");
 
                 var foundProduct = await _productService.GetProductById(id);
                 if (foundProduct == null)
                 {
-                    return NotFound(new ErrorResponse { Message = "The category not found" });
+                    return ApiResponse.NotFound("There is no product found matching");
+
                 }
 
-                return Ok(
-                    new SuccessResponse<Product>
-                    {
-                        Success = true,
-                        Message = "Product is returned successfully",
-                        Data = foundProduct
-                    }
-                );
+                return ApiResponse.Success(foundProduct, "product are returned successfully");
             }
             catch (Exception ex)
             {
-                Console.Write($"An error occurred while retrieving the productId");
-                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+                Console.Write($"An error occurred while retrieving the product Id");
+                return ApiResponse.ServerError(ex.Message);
             }
         }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductModel newProduct)
         {
+
             try
             {
-                await _productService.CreateProduct(newProduct);
-                return Ok(new SuccessResponse<ProductModel> { Message = "The product is Added" });
+                var AddProduct = await _productService.CreateProduct(newProduct);
+                return ApiResponse.Created(AddProduct, "The product is Added");
+
             }
             catch (Exception ex)
+
             {
                 Console.Write($"An error occurred while creating the product");
-                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
+
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
         {
+
             try
             {
                 var found = await _productService.UpdateProduct(id, updatedProduct);
                 if (found == null)
                 {
-                    return NotFound(new ErrorResponse { Message = "The product not found" });
+                    return ApiResponse.NotFound("The product not found");
                 }
-                return Ok(
-                    new SuccessResponse<Product> { Message = "Product updated", Data = found }
-                );
+
+                return ApiResponse.Success(found, "product are updated successfully");
+
             }
             catch (Exception ex)
             {
                 Console.Write($"An error occurred while updating the product");
-                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+
+                return ApiResponse.ServerError(ex.Message);
+
             }
+
+
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
+
             try
             {
                 var deleted = await _productService.DeleteProduct(id);
@@ -128,12 +135,15 @@ namespace api.Controllers
                 {
                     return NotFound(new ErrorResponse { Message = "The product not found" });
                 }
-                return Ok(new SuccessResponse<bool> { Message = "Product Deleted" });
+
+                return ApiResponse.Success("product are Deleted successfully");
+
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
+
     }
 }
