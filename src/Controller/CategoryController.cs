@@ -23,22 +23,17 @@ public class CategoryController : ControllerBase
             var categories = await _categoryService.GetCategories();
             if (categories.Count() <= 0)
             {
-                return NotFound(new ErrorResponse { Message = "There is no categories" });
+                return ApiResponse.NotFound("There is no categories found");
             }
-            return Ok(
-                new SuccessResponse<IEnumerable<Category>>
-                {
-                    Message = "All categories inside E-commerce system",
-                    Data = categories
-                }
-            );
+
+            return ApiResponse.Success(categories, "All categories inside E-commerce system are returned");
+
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the categories" }
-            );
+
+            return ApiResponse.ServerError(ex.Message);
+
         }
     }
 
@@ -50,18 +45,17 @@ public class CategoryController : ControllerBase
             var foundCategory = await _categoryService.GetCategoryById(id);
             if (foundCategory == null)
             {
-                return BadRequest(new ErrorResponse { Message = "The category not found" });
+                return ApiResponse.NotFound("There is no category found matching");
+
             }
-            return Ok(
-                new SuccessResponse<Category> { Message = "Category Detail", Data = foundCategory }
-            );
+
+            return ApiResponse.Success(foundCategory, "Category are returned successfully");
+
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on getting the category" }
-            );
+            return ApiResponse.ServerError(ex.Message);
+
         }
     }
 
@@ -70,12 +64,12 @@ public class CategoryController : ControllerBase
     {
         try
         {
-            await _categoryService.AddCategory(newCategory);
-            return Ok(new SuccessResponse<CategoryModel> { Message = "The category is Added" });
+            var AddCategory = await _categoryService.AddCategory(newCategory);
+            return ApiResponse.Created(AddCategory, "The category is Added");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(500, new ErrorResponse { Message = "Cannot add the category" });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 
@@ -87,16 +81,15 @@ public class CategoryController : ControllerBase
             var found = await _categoryService.UpdateCategoryName(id, updateData);
             if (found == null)
             {
-                return NotFound(new ErrorResponse { Message = "The category not found" });
+                return ApiResponse.NotFound("The category not found");
             }
-            return Ok(new SuccessResponse<Category> { Message = "Category updated", Data = found });
+            return ApiResponse.Success(found, "Category are updated successfully");
+
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on updating category" }
-            );
+            return ApiResponse.ServerError(ex.Message);
+
         }
     }
 
@@ -109,15 +102,16 @@ public class CategoryController : ControllerBase
             if (!deleted)
             {
                 return NotFound(new ErrorResponse { Message = "The category not found" });
+
             }
-            return Ok(new SuccessResponse<bool> { Message = "Category Deleted" });
+            return ApiResponse.Success("Category are Deleted successfully");
+
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(
-                500,
-                new ErrorResponse { Message = "There is an error on deleting category" }
-            );
+            return ApiResponse.ServerError(ex.Message);
+
         }
+
     }
 }

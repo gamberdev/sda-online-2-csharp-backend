@@ -29,9 +29,9 @@ namespace ecommerce.Tables
         public Guid CategoryId { get; set; }
 
         //Navigation properties
-        // public Category? Category { get; set; }
-        // public List<Review>? Reviews { get; set; }
-        // public List<OrderItem>? OrderItems { get; set; }
+         public Category? Category { get; set; }
+         public List<Review>? Reviews { get; set; }
+         public List<OrderItem>? OrderItems { get; set; }
 
 
     }
