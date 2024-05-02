@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce.EF;
 
 namespace ecommerce.Tables;
 
@@ -22,7 +23,7 @@ public class OrderItem
     public Guid OrderId { get; set; }
 
     //Navigation properties
-    // public Product? Product { get; set; }
-    // public Order? Order { get; set; }
-    // public User? User { get; set; }
+   public Product? Product { get; set; }
+     public Order? Order { get; set; }
+     public User? User { get; set; }
 }

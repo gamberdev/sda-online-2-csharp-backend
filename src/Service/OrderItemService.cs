@@ -19,8 +19,7 @@ public class OrderItemService {
     // Get all order items
     public async Task<IEnumerable<OrderItem>> GetAllOrderItems()
     {
-        await Task.CompletedTask;
-        var orderItems = _appDbContext.OrderItems.ToList();
+        var orderItems = await _appDbContext.OrderItems.Include(p => p.Product).Include(u => u.User).Include(o => o.Order).ToListAsync();
         return orderItems;
     }
 
@@ -28,17 +27,15 @@ public class OrderItemService {
    // Get order item by ID
     public async Task<OrderItem?> GetOrderItemById(Guid id)
 {
-      await Task.CompletedTask;
-        var orderItemsDb = _appDbContext.OrderItems.ToList();
-        var foundOrderItem = orderItemsDb.FirstOrDefault(orderItem => orderItem.OrderItemId == id);
-        return foundOrderItem;
+        var orderItems = await _appDbContext.OrderItems.Include(p => p.Product).Include(u => u.User).Include(o => o.Order).
+        FirstOrDefaultAsync(orderItem => orderItem.OrderItemId == id);
+        return orderItems;
 }
 
     // // Create a new order item
   
   public async Task<OrderItemModel> AddOrderItem(OrderItemModel newOrderItem)
     {
-        await Task.CompletedTask;
         OrderItem orderItem = new OrderItem
         {
             OrderItemId = Guid.NewGuid(),
@@ -46,24 +43,25 @@ public class OrderItemService {
             Price = newOrderItem.Price,
          
         };
-        _appDbContext.OrderItems.Add(orderItem);
-        _appDbContext.SaveChanges();
+      await  _appDbContext.OrderItems.AddAsync(orderItem);
+       await  _appDbContext.SaveChangesAsync();
         return newOrderItem;
     }
+
 
    // Update an existing order item
       public async Task<OrderItem?> UpdateOrderItem(Guid id, OrderItemModel updateOrderItem)
     {
         await Task.CompletedTask;
-        var orderItemsDb = _appDbContext.OrderItems.ToList();
-        var foundOrderItem = orderItemsDb.FirstOrDefault(orderItem => orderItem.OrderItemId == id);
+        var OrderItemsDb = _appDbContext.OrderItems.ToList();
+        var foundOrderItem = OrderItemsDb.FirstOrDefault(orderItem => orderItem.OrderItemId == id);
         if (foundOrderItem!= null)
         {
             foundOrderItem.Quantity = updateOrderItem.Quantity;
             foundOrderItem.Price = updateOrderItem.Price;
 
         }
-        _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
         return foundOrderItem;
     }
 
@@ -76,7 +74,7 @@ public class OrderItemService {
         if (foundOrderItem != null)
         {
             _appDbContext.OrderItems.Remove(foundOrderItem);
-            _appDbContext.SaveChanges();
+        await _appDbContext.SaveChangesAsync();
             return true;
         }
         return false;

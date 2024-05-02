@@ -17,7 +17,7 @@ public class OrderItemModel
     public Guid OrderId { get; set; }
 
     //Navigation properties
-    // public ProductModel? Product { get; set; }
-    // public OrderModel? Order { get; set; }
-    // public UserModel? User { get; set; }
+    public ProductModel? Product { get; set; }
+     public OrderModel? Order { get; set; }
+     public UserModel? User { get; set; }
 }
