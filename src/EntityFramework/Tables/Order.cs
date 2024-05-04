@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using ecommerce.EF;
 using ecommerce.Models;
 
-namespace ecommerce.Tables;
+namespace ecommerce.EntityFramework.Table;
 
 [Table("order")]
 public class Order

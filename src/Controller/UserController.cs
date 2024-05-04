@@ -1,8 +1,13 @@
-using api.Controllers;
-using ecommerce.EF;
 using ecommerce.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
+using ecommerce.service;
+using ecommerce.utils;
+
+
+namespace ecommerce.Controller;
 
 [ApiController]
 [Route("/users")]

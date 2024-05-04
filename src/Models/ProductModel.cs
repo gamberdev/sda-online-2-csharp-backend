@@ -13,7 +13,6 @@ public class ProductModel
     [Required(ErrorMessage = "Product Name is required")]
     [MinLength(2, ErrorMessage = "Product Name should be at least 2 letter")]
     public string? Name { get; set; }
-
     public string Slug { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Product Price is required")]
@@ -21,6 +20,8 @@ public class ProductModel
     public double Price { get; set; }
     public string? Description { get; set; }
     public string? Image { get; set; }
+    public DateTime CreatedAt { get; set; }
+
 
     //Foreign Key
     public Guid? CategoryId { get; set; }

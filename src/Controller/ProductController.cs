@@ -2,14 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.Tables;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using ecommerce.service;
 
-namespace api.Controllers
+
+namespace ecommerce.Controller
 {
     [ApiController]
     [Route("/products")]
@@ -23,19 +25,57 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts([FromQuery] int page = 1,[FromQuery] int limit = 2)
+        public async Task<IActionResult> GetAllProducts(
+           [FromQuery] int page = 1,
+           [FromQuery] int limit = 10,
+           [FromQuery] string? sortBy = "date",
+           [FromQuery] string? sortOrder = "asc",
+           [FromQuery] string? keyword = null, //name of product or description or price
+           [FromQuery] double? minPrice = 0,
+           [FromQuery] double? maxPrice = 20000.00)
         {
             try
             {
+                // Get all products from the service
                 var products = await _productService.GetAllProducts();
-                if (products.Count() <= 0)
+
+                // Apply filtering based on keyword and price range
+                if (!string.IsNullOrEmpty(keyword))
                 {
-                    return ApiResponse.NotFound("There is no products found");
+                    products = products.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword));
                 }
-                var pagination = products.Skip((page - 1) * limit).Take(limit).ToList();
+                if (minPrice.HasValue)
+                {
+                    products = products.Where(p => p.Price >= minPrice.Value);
+                }
+                if (maxPrice.HasValue)
+                {
+                    products = products.Where(p => p.Price <= maxPrice.Value);
+                }
+
+                // Apply sorting based on sort by and sort order
+                if (sortBy != null)
+
+                    switch (sortBy.ToLower())
+                    {
+                        case "date":
+                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.CreatedAt) : products.OrderByDescending(p => p.CreatedAt);
+                            break;
+                        case "name":
+                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.Name) : products.OrderByDescending(p => p.Name);
+                            break;
+                        // Add more cases for other sorting criteria if needed
+                        default:
+                            // Default sorting by date
+                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.CreatedAt) : products.OrderByDescending(p => p.CreatedAt);
+                            break;
+                    }
+
+                // Apply pagination
+                var paginatedProducts = products.Skip((page - 1) * limit).Take(limit).ToList();
 
                 return ApiResponse.Success(
-                    pagination,
+                    paginatedProducts,
                     "All products inside E-commerce system are returned"
                 );
             }
@@ -63,6 +103,21 @@ namespace api.Controllers
                 Console.Write($"An error occurred while retrieving the product Id");
                 return ApiResponse.ServerError(ex.Message);
             }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string searchKeyword)
+        {
+            // Retrieve products based on the search keyword
+            var products = await _productService.SearchProducts(searchKeyword);
+
+            if (products == null || !products.Any())
+            {
+                return ApiResponse.NotFound("No products found matching the search criteria.");
+
+            }
+            return ApiResponse.Success(products);
+
         }
 
         [HttpPost]
