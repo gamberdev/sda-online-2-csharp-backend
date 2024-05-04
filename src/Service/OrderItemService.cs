@@ -67,7 +67,7 @@ public class OrderItemService
         if (foundOrderItem != null)
         {
             foundOrderItem.Quantity = updateOrderItem.Quantity;
-            foundOrderItem.Price = updateOrderItem.Price;
+            foundOrderItem.Price = foundOrderItem.Price; //should not be change
         }
         await _appDbContext.SaveChangesAsync();
         return foundOrderItem;

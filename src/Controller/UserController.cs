@@ -69,7 +69,7 @@ public class UserController : ControllerBase
         {
             if (postgresException.SqlState == "23505")
             {
-                return ApiResponse.Conflict("Duplicate email. User with email already exists");
+                return ApiResponse.Conflict("Duplicate email/phone. User with email/phone already exists");
             }
             return ApiResponse.ServerError("Cannot add the user");
         }

@@ -81,7 +81,7 @@ public class OrderService
         );
         if (foundOrder != null)
         {
-            foundOrder.TotalPrice = updatedOrder.TotalPrice;
+            foundOrder.TotalPrice = foundOrder.TotalPrice; // Should not be change
             foundOrder.PaymentMethod = updatedOrder.PaymentMethod ?? foundOrder.PaymentMethod;
             foundOrder.OrderStatus = updatedOrder.OrderStatus;
             foundOrder.DeliveryAddress = updatedOrder.DeliveryAddress ?? foundOrder.DeliveryAddress;

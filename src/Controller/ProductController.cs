@@ -60,13 +60,11 @@ public class ProductController : ControllerBase
                 );
             }
 
-            if (minPrice.HasValue && minPrice < maxPrice)
+            if (minPrice.HasValue && minPrice < maxPrice && maxPrice.HasValue)
             {
-                products = products.Where(p => p.Price >= minPrice.Value);
-            }
-            if (maxPrice.HasValue && minPrice < maxPrice)
-            {
-                products = products.Where(p => p.Price <= maxPrice.Value);
+                products = products.Where(p =>
+                    p.Price >= minPrice.Value && p.Price <= maxPrice.Value
+                );
             }
 
             // Apply sorting based on sort by and sort order
@@ -121,7 +119,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpGet("search-keyword={searchKeyword}")]
+    [HttpGet("search")]
     public async Task<IActionResult> SearchProducts(string searchKeyword)
     {
         try

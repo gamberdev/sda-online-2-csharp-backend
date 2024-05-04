@@ -19,9 +19,7 @@ public class ProductService
     public async Task<IEnumerable<Product>> GetAllProducts()
     {
         var products = await _appDbContext
-            .Products.Include(c => c.Category)
-            .Include(r => r.Reviews)
-            .Include(i => i.OrderItems)
+            .Products
             .ToListAsync();
         return products;
     }
