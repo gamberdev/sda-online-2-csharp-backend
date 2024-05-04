@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
 using ecommerce.utils;
 using Microsoft.EntityFrameworkCore;
-using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 
 namespace ecommerce.service;
 
@@ -43,8 +40,11 @@ public class ProductService
 
     public async Task<IEnumerable<Product>> SearchProducts(string searchKeyword)
     {
-        var foundProducts = await _appDbContext.Products
-            .Where(p => EF.Functions.Like(p.Name, $"%{searchKeyword}%") || EF.Functions.Like(p.Description, $"%{searchKeyword}%"))
+        var foundProducts = await _appDbContext
+            .Products.Where(p =>
+                EF.Functions.Like(p.Name, $"%{searchKeyword}%")
+                || EF.Functions.Like(p.Description, $"%{searchKeyword}%")
+            )
             .ToListAsync();
         return foundProducts;
     }

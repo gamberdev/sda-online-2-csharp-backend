@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ecommerce.Models;
 using Microsoft.EntityFrameworkCore;
 using ecommerce.EntityFramework;
@@ -43,18 +39,23 @@ public class OrderItemService
     // Create a new order item
     public async Task<OrderItemModel> AddOrderItem(OrderItemModel newOrderItem)
     {
-        OrderItem orderItem = new OrderItem
+        var product = await _appDbContext.Products.FindAsync(newOrderItem.ProductId);
+        if (product != null)
         {
-            OrderItemId = Guid.NewGuid(),
-            Quantity = newOrderItem.Quantity,
-            Price = newOrderItem.Price,
-            ProductId = newOrderItem.ProductId,
-            UserId = newOrderItem.UserId,
-            OrderId = newOrderItem.OrderId,
-        };
-        await _appDbContext.OrderItems.AddAsync(orderItem);
-        await _appDbContext.SaveChangesAsync();
-        return newOrderItem;
+            OrderItem orderItem = new OrderItem
+            {
+                OrderItemId = Guid.NewGuid(),
+                Quantity = newOrderItem.Quantity,
+                Price = product.Price,
+                ProductId = newOrderItem.ProductId,
+                UserId = newOrderItem.UserId,
+                OrderId = newOrderItem.OrderId,
+            };
+            await _appDbContext.OrderItems.AddAsync(orderItem);
+            await _appDbContext.SaveChangesAsync();
+            return newOrderItem;
+        }
+        throw new InvalidOperationException("Product not found to Add");
     }
 
     // Update an existing order item

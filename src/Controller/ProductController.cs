@@ -1,112 +1,130 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ecommerce.Models;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
+using ecommerce.Models;
+using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using ecommerce.service;
 
+namespace ecommerce.Controller;
 
-namespace ecommerce.Controller
+public enum OrderBy
 {
-    [ApiController]
-    [Route("/products")]
-    public class ProductController : ControllerBase
+    ASC,
+    DESC
+}
+
+public enum SortBy
+{
+    Name,
+    Date
+}
+
+[ApiController]
+[Route("/products")]
+public class ProductController : ControllerBase
+{
+    private readonly ProductService _productService;
+
+    public ProductController(AppDbContext appDbContext)
     {
-        private readonly ProductService _productService;
+        _productService = new ProductService(appDbContext);
+    }
 
-        public ProductController(AppDbContext appDbContext)
+    [HttpGet]
+    public async Task<IActionResult> GetAllProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int limit = 5,
+        [FromQuery] SortBy sortBy = SortBy.Date,
+        [FromQuery] OrderBy orderBy = OrderBy.ASC,
+        [FromQuery] string? keyword = null, //name of product or description
+        [FromQuery] double? minPrice = 1,
+        [FromQuery] double? maxPrice = 20000.00
+    )
+    {
+        try
         {
-            _productService = new ProductService(appDbContext);
-        }
+            // Get all products from the service
+            var products = await _productService.GetAllProducts();
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllProducts(
-           [FromQuery] int page = 1,
-           [FromQuery] int limit = 10,
-           [FromQuery] string? sortBy = "date",
-           [FromQuery] string? sortOrder = "asc",
-           [FromQuery] string? keyword = null, //name of product or description or price
-           [FromQuery] double? minPrice = 0,
-           [FromQuery] double? maxPrice = 20000.00)
-        {
-            try
+            if (products.Count() <= 0)
             {
-                // Get all products from the service
-                var products = await _productService.GetAllProducts();
+                return ApiResponse.NotFound("There are no Products");
+            }
 
-                // Apply filtering based on keyword and price range
-                if (!string.IsNullOrEmpty(keyword))
-                {
-                    products = products.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword));
-                }
-                if (minPrice.HasValue)
-                {
-                    products = products.Where(p => p.Price >= minPrice.Value);
-                }
-                if (maxPrice.HasValue)
-                {
-                    products = products.Where(p => p.Price <= maxPrice.Value);
-                }
-
-                // Apply sorting based on sort by and sort order
-                if (sortBy != null)
-
-                    switch (sortBy.ToLower())
-                    {
-                        case "date":
-                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.CreatedAt) : products.OrderByDescending(p => p.CreatedAt);
-                            break;
-                        case "name":
-                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.Name) : products.OrderByDescending(p => p.Name);
-                            break;
-                        // Add more cases for other sorting criteria if needed
-                        default:
-                            // Default sorting by date
-                            products = sortOrder?.ToLower() == "asc" ? products.OrderBy(p => p.CreatedAt) : products.OrderByDescending(p => p.CreatedAt);
-                            break;
-                    }
-
-                // Apply pagination
-                var paginatedProducts = products.Skip((page - 1) * limit).Take(limit).ToList();
-
-                return ApiResponse.Success(
-                    paginatedProducts,
-                    "All products inside E-commerce system are returned"
+            // Apply filtering based on keyword and price range
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                products = products.Where(p =>
+                    p.Name!.Contains(keyword) || p.Description!.Contains(keyword)
                 );
             }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(Guid id)
+            if (minPrice.HasValue && minPrice < maxPrice)
+            {
+                products = products.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue && minPrice < maxPrice)
+            {
+                products = products.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Apply sorting based on sort by and sort order
+            switch (sortBy)
+            {
+                case SortBy.Name:
+                    products =
+                        orderBy == OrderBy.ASC
+                            ? products.OrderBy(p => p.Name)
+                            : products.OrderByDescending(p => p.Name);
+                    break;
+                default:
+                    // Default sorting by date
+                    products =
+                        orderBy == OrderBy.ASC
+                            ? products.OrderBy(p => p.CreatedAt)
+                            : products.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            // Apply pagination
+            var paginatedProducts = products.Skip((page - 1) * limit).Take(limit).ToList();
+
+            return ApiResponse.Success(
+                paginatedProducts,
+                "All products inside E-commerce system are returned"
+            );
+        }
+        catch (Exception ex)
         {
-            try
-            {
-                var foundProduct = await _productService.GetProductById(id);
-                if (foundProduct == null)
-                {
-                    return ApiResponse.NotFound("There is no product found matching");
-                }
-
-                return ApiResponse.Success(foundProduct, "Product are returned successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.Write($"An error occurred while retrieving the product Id");
-                return ApiResponse.ServerError(ex.Message);
-            }
+            return ApiResponse.ServerError(ex.Message);
         }
+    }
 
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchProducts(string searchKeyword)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProductById(Guid id)
+    {
+        try
+        {
+            var foundProduct = await _productService.GetProductById(id);
+            if (foundProduct == null)
+            {
+                return ApiResponse.NotFound("There is no product found matching");
+            }
+
+            return ApiResponse.Success(foundProduct, "Product are returned successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.Write($"An error occurred while retrieving the product Id");
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
+    [HttpGet("search-keyword={searchKeyword}")]
+    public async Task<IActionResult> SearchProducts(string searchKeyword)
+    {
+        try
         {
             // Retrieve products based on the search keyword
             var products = await _productService.SearchProducts(searchKeyword);
@@ -114,64 +132,66 @@ namespace ecommerce.Controller
             if (products == null || !products.Any())
             {
                 return ApiResponse.NotFound("No products found matching the search criteria.");
-
             }
             return ApiResponse.Success(products);
-
         }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateProduct(ProductModel newProduct)
+        catch (Exception ex)
         {
-            try
-            {
-                var AddProduct = await _productService.CreateProduct(newProduct);
-                return ApiResponse.Created(AddProduct, "The product is Added");
-            }
-            catch (Exception ex)
-            {
-                Console.Write($"An error occurred while creating the product");
-                return ApiResponse.ServerError(ex.Message);
-            }
+            return ApiResponse.ServerError(ex.Message);
         }
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct(ProductModel newProduct)
+    {
+        try
         {
-            try
-            {
-                var found = await _productService.UpdateProduct(id, updatedProduct);
-                if (found == null)
-                {
-                    return ApiResponse.NotFound("The product not found");
-                }
-
-                return ApiResponse.Success(found, "Product are updated successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.Write($"An error occurred while updating the product");
-
-                return ApiResponse.ServerError(ex.Message);
-            }
+            var AddProduct = await _productService.CreateProduct(newProduct);
+            return ApiResponse.Created(AddProduct, "The product is Added");
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        catch (Exception ex)
         {
-            try
+            Console.Write($"An error occurred while creating the product");
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
+    {
+        try
+        {
+            var found = await _productService.UpdateProduct(id, updatedProduct);
+            if (found == null)
             {
-                var deleted = await _productService.DeleteProduct(id);
-                if (!deleted)
-                {
-                    return ApiResponse.NotFound("The product not found");
-                }
-                return ApiResponse.Success(id, "product are Deleted successfully");
+                return ApiResponse.NotFound("The product not found");
             }
-            catch (Exception ex)
+
+            return ApiResponse.Success(found, "Product are updated successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.Write($"An error occurred while updating the product");
+
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        try
+        {
+            var deleted = await _productService.DeleteProduct(id);
+            if (!deleted)
             {
-                return ApiResponse.ServerError(ex.Message);
+                return ApiResponse.NotFound("The product not found");
             }
+            return ApiResponse.Success(id, "product are Deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 }

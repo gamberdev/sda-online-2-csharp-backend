@@ -1,5 +1,4 @@
 using ecommerce.Models;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;

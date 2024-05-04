@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ecommerce.Models;
 
@@ -18,9 +14,6 @@ public enum OrderStatus
 public class OrderModel
 {
     public Guid OrderId { get; set; }
-
-    [Required(ErrorMessage = "TotalPrice is required")]
-    [Range(0.01, 20000000.00, ErrorMessage = "Price must be between 0.01 and 20000000.00")]
     public double TotalPrice { get; set; }
     public DateTime OrderDate { get; set; }
     public DateTime DeliveryDate { get; set; }

@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
+using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.service;
-
 
 namespace ecommerce.Controller;
 
@@ -65,7 +59,7 @@ public class ReviewController : ControllerBase
         try
         {
             await _reviewService.AddReview(newReview);
-            return ApiResponse.Created(newReview,"The Review is Added");
+            return ApiResponse.Created(newReview, "The Review is Added");
         }
         catch (Exception)
         {
@@ -101,7 +95,7 @@ public class ReviewController : ControllerBase
             {
                 return ApiResponse.NotFound("The Review not found");
             }
-            return ApiResponse.Success(id,"Review Deleted");
+            return ApiResponse.Success(id, "Review Deleted");
         }
         catch (Exception)
         {

@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ecommerce.Models;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
+using ecommerce.Models;
+using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.service;
-
 
 namespace ecommerce.Controller;
 
@@ -46,7 +41,7 @@ public class OrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.Write($"an error occured while retrieving all orders");
+            Console.Write($"an error occurred while retrieving all orders");
 
             return StatusCode(500, new ErrorResponse { Message = ex.Message });
         }

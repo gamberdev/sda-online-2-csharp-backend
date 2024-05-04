@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ecommerce.EntityFramework;
 using ecommerce.Models;
+using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
-using ecommerce.service;
-
 
 namespace ecommerce.Controller;
 
@@ -69,6 +63,9 @@ public class OrderItemController : ControllerBase
         {
             await _orderItemService.AddOrderItem(newOrderItem);
             return ApiResponse.Created(newOrderItem, "The OrderItem is Added");
+        }
+        catch(InvalidOperationException ex){
+            return ApiResponse.BadRequest(ex.Message);
         }
         catch (Exception)
         {

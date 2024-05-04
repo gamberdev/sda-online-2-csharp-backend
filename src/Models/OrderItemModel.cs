@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ecommerce.Models;
 
@@ -11,6 +7,7 @@ public class OrderItemModel
     public Guid OrderItemId { get; set; }
 
     [Required]
+    [Range(1, 30, ErrorMessage = "The value must be greater than 0.")]
     public int Quantity { get; set; }
 
     public double Price { get; set; }

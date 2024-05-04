@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using ecommerce.Models;
 
 namespace ecommerce.EntityFramework.Table;
@@ -14,7 +10,7 @@ public class Order
     public Guid OrderId { get; set; }
 
     [Column("total_price")]
-    public double TotalPrice { get; set; }
+    public double? TotalPrice { get; set; }
 
     [Column("order_date")]
     public DateTime OrderDate { get; set; }

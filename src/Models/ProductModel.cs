@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ecommerce.Models;
 
@@ -20,7 +16,7 @@ public class ProductModel
     public double Price { get; set; }
     public string? Description { get; set; }
     public string? Image { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
     //Foreign Key
