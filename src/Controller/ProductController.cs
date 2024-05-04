@@ -2,14 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.Tables;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using ecommerce.service;
 
-namespace api.Controllers
+
+namespace ecommerce.Controller
 {
     [ApiController]
     [Route("/products")]
@@ -23,7 +25,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts([FromQuery] int page = 1,[FromQuery] int limit = 2)
+        public async Task<IActionResult> GetAllProducts([FromQuery] int page = 1, [FromQuery] int limit = 2)
         {
             try
             {
@@ -63,6 +65,21 @@ namespace api.Controllers
                 Console.Write($"An error occurred while retrieving the product Id");
                 return ApiResponse.ServerError(ex.Message);
             }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string keyword)
+        {
+            // Retrieve products based on the search keyword
+            var products = await _productService.SearchProducts(keyword);
+
+            if (products == null || !products.Any())
+            {
+                return ApiResponse.NotFound("No products found matching the search criteria.");
+
+            }
+            return ApiResponse.Success(products);
+
         }
 
         [HttpPost]

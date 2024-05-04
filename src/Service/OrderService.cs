@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ecommerce.Models;
-using ecommerce.Tables;
 using Microsoft.EntityFrameworkCore;
 
-namespace ecommerce.EF;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
+
+namespace ecommerce.service;
 
 public class OrderService
 {

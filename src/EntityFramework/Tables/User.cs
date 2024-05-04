@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using ecommerce.Models;
-using ecommerce.Tables;
 
-namespace ecommerce.EF;
+namespace ecommerce.EntityFramework.Table;
 
 [Table("users")]
 public class User

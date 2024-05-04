@@ -1,9 +1,10 @@
-using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.Tables;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 
+namespace ecommerce.service;
 public class UserService
 {
     private readonly AppDbContext _appDbContext;

@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.Tables;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
+using ecommerce.service;
 
-namespace api.Controllers;
+
+namespace ecommerce.Controller;
 
 [ApiController]
 [Route("/orders")]

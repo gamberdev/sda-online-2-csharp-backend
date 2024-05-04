@@ -4,19 +4,20 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using ecommerce.EF;
 
-namespace ecommerce.Tables;
+namespace ecommerce.EntityFramework.Table;
 
-[Table("review")]
-public class Review
+[Table("order_item")]
+public class OrderItem
 {
-    [Column("review_id")]
-    public Guid ReviewId { get; set; }
+    [Column("orderItem_id")]
+    public Guid OrderItemId { get; set; }
 
-    [MinLength(5)]
-    [Column("comment")]
-    public string? Comment { get; set; }
+    [Column("quantity")]
+    public int Quantity { get; set; }
+
+    [Column("price")]
+    public double Price { get; set; }
 
     //Foreign Key
     [Column("product_id")]
@@ -25,7 +26,11 @@ public class Review
     [Column("user_id")]
     public Guid UserId { get; set; }
 
+    [Column("order_id")]
+    public Guid? OrderId { get; set; }
+
     //Navigation properties
     public Product? Product { get; set; }
+    public Order? Order { get; set; }
     public User? User { get; set; }
 }

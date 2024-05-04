@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ecommerce.EF;
 using ecommerce.Models;
-using ecommerce.Tables;
 using ecommerce.utils;
 using Microsoft.EntityFrameworkCore;
+using ecommerce.EntityFramework;
+using ecommerce.EntityFramework.Table;
 
-// Products data
-namespace ecommerce.EF;
+namespace ecommerce.service;
 
 public class ProductService
 {
@@ -40,6 +39,14 @@ public class ProductService
             .Include(i => i.OrderItems)
             .FirstOrDefaultAsync(product => product.ProductId == id);
         return foundProduct;
+    }
+
+    public async Task<IEnumerable<Product>> SearchProducts(string keyword)
+    {
+        var foundProducts = await _appDbContext.Products
+            .Where(p => EF.Functions.Like(p.Name, $"%{keyword}%") || EF.Functions.Like(p.Description, $"%{keyword}%"))
+            .ToListAsync();
+        return foundProducts;
     }
 
     // Create a new product

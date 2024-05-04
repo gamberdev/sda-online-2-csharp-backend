@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api.Controllers
+namespace ecommerce.utils
 {
     public static class ApiResponse
     {

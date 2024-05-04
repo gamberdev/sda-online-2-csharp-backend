@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ecommerce.Tables;
+namespace ecommerce.EntityFramework.Table;
 
 [Table("category")]
 public class Category
