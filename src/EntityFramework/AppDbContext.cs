@@ -36,15 +36,13 @@ public class AppDbContext : DbContext
         // Category Name
         modelBuilder.Entity<Category>().Property(category => category.Name).IsRequired();
         modelBuilder.Entity<Category>().HasIndex(category => category.Name).IsUnique();
-        // Category Slug
         modelBuilder.Entity<Category>().HasIndex(category => category.Slug).IsUnique();
 
         // Product Constraint
-        // Product Name
         modelBuilder.Entity<Product>().Property(product => product.Name).IsRequired();
         modelBuilder.Entity<Product>().HasIndex(product => product.Name).IsUnique();
-        // Product Price
         modelBuilder.Entity<Product>().Property(product => product.Price).IsRequired();
+        modelBuilder.Entity<Product>().Property(product=> product.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // Users Constraint
         modelBuilder.Entity<User>().Property(u => u.FullName).IsRequired();
@@ -53,10 +51,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().Property(u => u.Password).IsRequired();
         modelBuilder.Entity<User>().Property(u => u.Phone).IsRequired();
         modelBuilder.Entity<User>().HasIndex(u => u.Phone).IsUnique();
-        modelBuilder
-            .Entity<User>()
-            .Property(u => u.CreatedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        modelBuilder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
         modelBuilder.Entity<User>().Property(u => u.IsBanned).HasDefaultValue(false);
 
         // Review Constraint
@@ -64,10 +59,7 @@ public class AppDbContext : DbContext
 
         // Order Constraint
         modelBuilder.Entity<Order>().Property(u => u.DeliveryAddress).IsRequired();
-        modelBuilder
-            .Entity<Order>()
-            .Property(o => o.OrderDate)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        modelBuilder.Entity<Order>().Property(o => o.OrderDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // OrderItem Constraint
         modelBuilder.Entity<OrderItem>().Property(oi => oi.Quantity).IsRequired();

@@ -30,6 +30,9 @@ namespace ecommerce.EntityFramework.Table
         [Column("image")]
         public string Image { get; set; } = string.Empty;
 
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
         //Foreign Key
         [Column("category_id")]
         public Guid? CategoryId { get; set; }

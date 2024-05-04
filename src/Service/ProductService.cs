@@ -41,10 +41,10 @@ public class ProductService
         return foundProduct;
     }
 
-    public async Task<IEnumerable<Product>> SearchProducts(string keyword)
+    public async Task<IEnumerable<Product>> SearchProducts(string searchKeyword)
     {
         var foundProducts = await _appDbContext.Products
-            .Where(p => EF.Functions.Like(p.Name, $"%{keyword}%") || EF.Functions.Like(p.Description, $"%{keyword}%"))
+            .Where(p => EF.Functions.Like(p.Name, $"%{searchKeyword}%") || EF.Functions.Like(p.Description, $"%{searchKeyword}%"))
             .ToListAsync();
         return foundProducts;
     }
@@ -60,6 +60,7 @@ public class ProductService
             Slug = Function.GetSlug(newProduct.Name ?? ""),
             Description = newProduct.Description,
             Image = newProduct.Image ?? "",
+            CreatedAt = DateTime.UtcNow,
             CategoryId = newProduct.CategoryId
         };
         await _appDbContext.Products.AddAsync(product);
