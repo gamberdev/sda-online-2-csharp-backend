@@ -27,23 +27,17 @@ public class OrderController : ControllerBase
 
             if (orders.ToList().Count < 1)
             {
-                return NotFound(new ErrorResponse { Success = false, Message = "No orders found" });
+                return ApiResponse.NotFound("No orders found");
             }
 
-            return Ok(
-                new SuccessResponse<IEnumerable<Order>>
-                {
-                    Success = true,
-                    Message = "all orders are returned successfully",
-                    Data = orders
-                }
-            );
+            return ApiResponse.Success(orders, "All Orders are returned successfully");
+
         }
         catch (Exception ex)
         {
             Console.Write($"an error occurred while retrieving all orders");
 
-            return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 
@@ -52,27 +46,20 @@ public class OrderController : ControllerBase
     {
         try
         {
-            // return BadRequest("Invalid order ID Format");
 
             var foundOrder = await _orderService.GetOrderById(id);
             if (foundOrder == null)
             {
-                return NotFound(new ErrorResponse { Message = "The order not found" });
+                return ApiResponse.NotFound("The order not found");
             }
 
-            return Ok(
-                new SuccessResponse<Order>
-                {
-                    Success = true,
-                    Message = "all order are returned successfully",
-                    Data = foundOrder
-                }
-            );
+            return ApiResponse.Success(foundOrder, "Order is returned successfully");
+
         }
         catch (Exception ex)
         {
             Console.Write($"An error occurred while retrieving the orderId");
-            return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 
@@ -82,12 +69,11 @@ public class OrderController : ControllerBase
         try
         {
             await _orderService.CreateOrder(newOrder);
-            return Ok(new SuccessResponse<OrderModel> { Message = "The order is Added" });
+            return ApiResponse.Created(newOrder, "The order is Added");
         }
         catch (Exception ex)
         {
-            Console.Write($"An error occurred while creating the product");
-            return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 
@@ -99,15 +85,15 @@ public class OrderController : ControllerBase
             var found = await _orderService.UpdateOrder(id, updatedOrder);
             if (found == null)
             {
-                return NotFound(new ErrorResponse { Message = "The order not found" });
+                return ApiResponse.NotFound("The order not found");
             }
-            return Ok(new SuccessResponse<Order> { Message = "Order updated", Data = found });
+            return ApiResponse.Success(found, "Order is updated");
         }
         catch (Exception ex)
         {
             Console.Write($"An error occurred while updating the Order");
 
-            return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 
@@ -119,13 +105,13 @@ public class OrderController : ControllerBase
             var deleted = await _orderService.DeleteOrder(id);
             if (!deleted)
             {
-                return NotFound(new ErrorResponse { Message = "The Order not found" });
+                return ApiResponse.NotFound("The Order not found");
             }
-            return Ok(new SuccessResponse<bool> { Message = "Order Deleted" });
+            return ApiResponse.Success(id, "Order Deleted");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            return ApiResponse.ServerError(ex.Message);
         }
     }
 }
