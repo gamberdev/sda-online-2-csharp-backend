@@ -35,6 +35,7 @@ public class UserService
 
     public async Task<UserModel> AddUser(UserModel newUser)
     {
+    Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
         User user = new User
         {
             UserId = Guid.NewGuid(),
@@ -42,7 +43,8 @@ public class UserService
             Email = newUser.Email,
             Phone = newUser.Phone,
             Password = newUser.Password,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Role = userRole
         };
         await _appDbContext.Users.AddAsync(user);
         await _appDbContext.SaveChangesAsync();
