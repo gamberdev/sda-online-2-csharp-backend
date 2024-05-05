@@ -26,7 +26,7 @@ public class OrderItemService
         return orderItems;
     }
 
-    // Get all items that not ordered yet
+    // Get all items that not ordered yet by passing userId
     public async Task<IEnumerable<OrderItem>> GetCartItem(Guid id)
     {
         var cartItems = await _appDbContext

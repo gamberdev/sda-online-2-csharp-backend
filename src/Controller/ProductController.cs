@@ -4,6 +4,7 @@ using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ecommerce.Controller;
@@ -55,7 +56,7 @@ public class ProductController : ControllerBase
             // Apply filtering based on keyword and price range
             if (!string.IsNullOrEmpty(keyword))
             {
-                keyword = keyword.ToLower();
+                keyword = keyword!.ToLower();
                 products = products.Where(p =>
                     p.Name!.ToLower().Contains(keyword)
                     || p.Description!.ToLower().Contains(keyword)
@@ -149,10 +150,16 @@ public class ProductController : ControllerBase
             var AddProduct = await _productService.CreateProduct(newProduct);
             return ApiResponse.Created(AddProduct, "The product is Added");
         }
-        catch (Exception ex)
+        catch (DbUpdateException ex)
+            when (ex.InnerException is Npgsql.PostgresException postgresException)
         {
-            Console.Write($"An error occurred while creating the product");
-            return ApiResponse.ServerError(ex.Message);
+            if (postgresException.SqlState == "23505")
+            {
+                return ApiResponse.Conflict(
+                    "Duplicate Name. Product with this name is already exist"
+                );
+            }
+            return ApiResponse.ServerError("An error occurred while creating the product");
         }
     }
 

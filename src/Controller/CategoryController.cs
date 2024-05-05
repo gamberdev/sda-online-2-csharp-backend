@@ -1,9 +1,9 @@
 using ecommerce.EntityFramework;
 using ecommerce.Models;
+using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.service;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.Controller;
 
@@ -67,9 +67,16 @@ public class CategoryController : ControllerBase
             var AddCategory = await _categoryService.AddCategory(newCategory);
             return ApiResponse.Created(AddCategory, "The category is Added");
         }
-        catch (Exception ex)
+        catch (DbUpdateException ex)
+            when (ex.InnerException is Npgsql.PostgresException postgresException)
         {
-            return ApiResponse.ServerError(ex.Message);
+            if (postgresException.SqlState == "23505")
+            {
+                return ApiResponse.Conflict(
+                    "Duplicate Name. Category with this name is already exist"
+                );
+            }
+            return ApiResponse.ServerError("An error occurred while creating the category");
         }
     }
 

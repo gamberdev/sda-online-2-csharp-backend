@@ -75,11 +75,11 @@ public class ProductService
         );
         if (foundProduct != null)
         {
-            foundProduct.Name = updatedProduct.Name;
+            foundProduct.Name = updatedProduct.Name ?? foundProduct.Name; 
             foundProduct.Price = updatedProduct.Price;
-            foundProduct.Slug = Function.GetSlug(updatedProduct.Name ?? "");
-            foundProduct.Description = updatedProduct.Description;
-            foundProduct.Image = updatedProduct.Image ?? "";
+            foundProduct.Slug = Function.GetSlug(foundProduct.Name ?? "");
+            foundProduct.Description = updatedProduct.Description ?? foundProduct.Description;
+            foundProduct.Image = updatedProduct.Image ?? foundProduct.Image;
         }
         await _appDbContext.SaveChangesAsync();
         return foundProduct;
