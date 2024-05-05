@@ -38,10 +38,11 @@ public class ProductService
 
     public async Task<IEnumerable<Product>> SearchProducts(string searchKeyword)
     {
+        searchKeyword = searchKeyword.ToLower();
         var foundProducts = await _appDbContext
             .Products.Where(p =>
-                EF.Functions.Like(p.Name, $"%{searchKeyword}%")
-                || EF.Functions.Like(p.Description, $"%{searchKeyword}%")
+                EF.Functions.Like(p.Name!.ToLower(), $"%{searchKeyword}%")
+                || EF.Functions.Like(p.Description!.ToLower(), $"%{searchKeyword}%")
             )
             .ToListAsync();
         return foundProducts;
