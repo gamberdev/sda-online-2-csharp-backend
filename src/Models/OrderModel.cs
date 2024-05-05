@@ -8,7 +8,7 @@ public enum OrderStatus
     Processing,
     OutForDelivery,
     Delivered,
-    Cancelled
+    Canceled
 }
 
 public class OrderModel
