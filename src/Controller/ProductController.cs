@@ -53,10 +53,11 @@ public class ProductController : ControllerBase
             }
 
             // Apply filtering based on keyword and price range
+             keyword = keyword!.ToLower();
             if (!string.IsNullOrEmpty(keyword))
             {
                 products = products.Where(p =>
-                    p.Name!.Contains(keyword) || p.Description!.Contains(keyword)
+                    p.Name!.ToLower().Contains(keyword) || p.Description!.ToLower().Contains(keyword)
                 );
             }
 
