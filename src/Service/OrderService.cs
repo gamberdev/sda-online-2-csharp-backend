@@ -43,7 +43,9 @@ public class OrderService
     {
         double total = 0;
         var foundOrderItems = await _appDbContext
-            .OrderItems.Where(orderItem => orderItem.OrderId == null)
+            .OrderItems.Where(orderItem =>
+                orderItem.OrderId == null && orderItem.UserId == newOrder.UserId
+            )
             .ToListAsync();
         Order order = new Order
         {

@@ -178,6 +178,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Description");
+
                     b.HasIndex("Name")
                         .IsUnique();
 

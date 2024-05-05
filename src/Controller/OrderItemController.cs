@@ -37,6 +37,25 @@ public class OrderItemController : ControllerBase
         }
     }
 
+    [HttpGet("cart")]
+    public async Task<IActionResult> GetCartItem(Guid id)
+    {
+        try
+        {
+            var cartItems = await _orderItemService.GetCartItem(id);
+
+            if (cartItems.Count() <= 0)
+            {
+                return ApiResponse.NotFound("The Cart is Empty");
+            }
+            return ApiResponse.Success(cartItems, "All cartItems for the current user");
+        }
+        catch (Exception)
+        {
+            return ApiResponse.ServerError("There is an error on getting the cartItems");
+        }
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrderItemById(Guid id)
     {
@@ -64,7 +83,8 @@ public class OrderItemController : ControllerBase
             await _orderItemService.AddOrderItem(newOrderItem);
             return ApiResponse.Created(newOrderItem, "The OrderItem is Added");
         }
-        catch(InvalidOperationException ex){
+        catch (InvalidOperationException ex)
+        {
             return ApiResponse.BadRequest(ex.Message);
         }
         catch (Exception)

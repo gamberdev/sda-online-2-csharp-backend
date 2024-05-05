@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Relation7 : Migration
+    public partial class tables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -184,6 +184,11 @@ namespace Backend.Migrations
                 name: "IX_products_category_id",
                 table: "products",
                 column: "category_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_description",
+                table: "products",
+                column: "description");
 
             migrationBuilder.CreateIndex(
                 name: "IX_products_name",

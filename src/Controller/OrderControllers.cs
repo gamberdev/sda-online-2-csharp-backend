@@ -31,12 +31,9 @@ public class OrderController : ControllerBase
             }
 
             return ApiResponse.Success(orders, "All Orders are returned successfully");
-
         }
         catch (Exception ex)
         {
-            Console.Write($"an error occurred while retrieving all orders");
-
             return ApiResponse.ServerError(ex.Message);
         }
     }
@@ -46,7 +43,6 @@ public class OrderController : ControllerBase
     {
         try
         {
-
             var foundOrder = await _orderService.GetOrderById(id);
             if (foundOrder == null)
             {
@@ -54,11 +50,9 @@ public class OrderController : ControllerBase
             }
 
             return ApiResponse.Success(foundOrder, "Order is returned successfully");
-
         }
         catch (Exception ex)
         {
-            Console.Write($"An error occurred while retrieving the orderId");
             return ApiResponse.ServerError(ex.Message);
         }
     }
@@ -91,8 +85,6 @@ public class OrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.Write($"An error occurred while updating the Order");
-
             return ApiResponse.ServerError(ex.Message);
         }
     }
