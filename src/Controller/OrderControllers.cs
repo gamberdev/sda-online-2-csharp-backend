@@ -106,4 +106,26 @@ public class OrderController : ControllerBase
             return ApiResponse.ServerError(ex.Message);
         }
     }
+
+
+[HttpPut("{id}/cancel")]
+public async Task<IActionResult> CancelOrder(Guid id)
+{
+    try
+    {
+        var canceled = await _orderService.CancelOrder(id);
+        if (!canceled)
+        {
+            return ApiResponse.NotFound("The order not found");
+        }
+        return ApiResponse.Success(id, "Order Canceled");
+    }
+    catch (Exception ex)
+    {
+        return ApiResponse.ServerError(ex.Message);
+    }
+}
+
+
+
 }
