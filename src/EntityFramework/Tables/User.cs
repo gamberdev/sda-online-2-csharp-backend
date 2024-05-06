@@ -20,12 +20,9 @@ public class User
     [Column("phone")]
     public string? Phone { get; set; }
 
-    [EmailAddress]
     [Column("email")]
     public string? Email { get; set; }
 
-    [MaxLength(20)]
-    [MinLength(5)]
     [Column("password")]
     public string? Password { get; set; }
 

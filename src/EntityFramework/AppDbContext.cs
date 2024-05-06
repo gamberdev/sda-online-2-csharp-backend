@@ -90,6 +90,7 @@ public class AppDbContext : DbContext
             .HasOne(oi => oi.Order)
             .WithMany(oi => oi.OrderItems)
             .HasForeignKey(oi => oi.OrderId)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
 
         // Configure one-to-many relationship between Product and Category

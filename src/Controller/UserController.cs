@@ -1,11 +1,10 @@
-using ecommerce.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
+using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
-
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.Controller;
 
@@ -56,6 +55,20 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPost("signIn")]
+    public async Task<IActionResult> SignIn(string email, string password)
+    {
+        try
+        {
+            var userSignIn = await _userService.SignIn(email, password);
+            return ApiResponse.Success(userSignIn, "User is SignIn successfully");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.UnAuthorized(ex.Message);
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddUser(UserModel newUser)
     {
@@ -69,7 +82,9 @@ public class UserController : ControllerBase
         {
             if (postgresException.SqlState == "23505")
             {
-                return ApiResponse.Conflict("Duplicate email/phone. User with email/phone already exists");
+                return ApiResponse.Conflict(
+                    "Duplicate email/phone. User with email/phone already exists"
+                );
             }
             return ApiResponse.ServerError("Cannot add the user");
         }

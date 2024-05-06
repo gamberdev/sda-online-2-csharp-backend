@@ -107,25 +107,22 @@ public class OrderController : ControllerBase
         }
     }
 
-
-[HttpPut("{id}/cancel")]
-public async Task<IActionResult> CancelOrder(Guid id)
-{
-    try
+    [HttpPut("{id}/cancel")]
+    //change order status to cancel by pass order id
+    public async Task<IActionResult> CancelOrder(Guid id)
     {
-        var canceled = await _orderService.CancelOrder(id);
-        if (!canceled)
+        try
         {
-            return ApiResponse.NotFound("The order not found");
+            var canceled = await _orderService.CancelOrder(id);
+            if (!canceled)
+            {
+                return ApiResponse.NotFound("The order not found");
+            }
+            return ApiResponse.Success(id, "Order Canceled");
         }
-        return ApiResponse.Success(id, "Order Canceled");
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
+        }
     }
-    catch (Exception ex)
-    {
-        return ApiResponse.ServerError(ex.Message);
-    }
-}
-
-
-
 }

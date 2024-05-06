@@ -105,19 +105,17 @@ public class OrderService
     }
 
     // Update the existing order cancellation method to change the order status to "canceled"
-public async Task<bool> CancelOrder(Guid id)
-{
-    var foundOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order =>
-        order.OrderId == id
-    );
-    if (foundOrder != null)
+    public async Task<bool> CancelOrder(Guid id)
     {
-        foundOrder.OrderStatus = OrderStatus.Canceled;
-        await _appDbContext.SaveChangesAsync();
-        return true;
+        var foundOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order =>
+            order.OrderId == id
+        );
+        if (foundOrder != null)
+        {
+            foundOrder.OrderStatus = OrderStatus.Canceled;
+            await _appDbContext.SaveChangesAsync();
+            return true;
+        }
+        return false;
     }
-    return false;
-}
-
-
 }

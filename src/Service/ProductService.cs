@@ -19,7 +19,8 @@ public class ProductService
     public async Task<IEnumerable<Product>> GetAllProducts()
     {
         var products = await _appDbContext
-            .Products
+            .Products.Include(c => c.Category)
+            .Include(r => r.Reviews)
             .ToListAsync();
         return products;
     }
@@ -75,7 +76,7 @@ public class ProductService
         );
         if (foundProduct != null)
         {
-            foundProduct.Name = updatedProduct.Name ?? foundProduct.Name; 
+            foundProduct.Name = updatedProduct.Name ?? foundProduct.Name;
             foundProduct.Price = updatedProduct.Price;
             foundProduct.Slug = Function.GetSlug(foundProduct.Name ?? "");
             foundProduct.Description = updatedProduct.Description ?? foundProduct.Description;

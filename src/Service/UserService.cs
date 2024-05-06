@@ -1,16 +1,20 @@
-using ecommerce.Models;
-using Microsoft.EntityFrameworkCore;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
+using ecommerce.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.service;
+
 public class UserService
 {
     private readonly AppDbContext _appDbContext;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
     public UserService(AppDbContext appDbContext)
     {
         _appDbContext = appDbContext;
+        _passwordHasher = new PasswordHasher<User>();
     }
 
     public async Task<IEnumerable<User>> GetUsers()
@@ -33,9 +37,25 @@ public class UserService
         return foundUser;
     }
 
+    public async Task<User?> SignIn(string email, string password)
+    {
+        var allUsers = await _appDbContext.Users.ToListAsync();
+        var loginUser =
+            allUsers.FirstOrDefault(user =>
+                user.Email!.Equals(email, StringComparison.OrdinalIgnoreCase)
+            ) ?? throw new Exception("User with this email not exist");
+
+        var result = _passwordHasher.VerifyHashedPassword(loginUser, loginUser.Password!, password);
+        if (result == PasswordVerificationResult.Success)
+        {
+            return loginUser;
+        }
+        throw new Exception("Unauthorize Access, incorrect Password for this email");
+    }
+
     public async Task<UserModel> AddUser(UserModel newUser)
     {
-    Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
+        Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
         User user = new User
         {
             UserId = Guid.NewGuid(),
@@ -46,6 +66,8 @@ public class UserService
             CreatedAt = DateTime.UtcNow,
             Role = userRole
         };
+        //hash the password
+        user.Password = _passwordHasher.HashPassword(user, user.Password!);
         await _appDbContext.Users.AddAsync(user);
         await _appDbContext.SaveChangesAsync();
         return newUser;
@@ -59,7 +81,7 @@ public class UserService
             foundUser.FullName = updateUser.FullName ?? foundUser.FullName;
             foundUser.Email = updateUser.Email ?? foundUser.Email;
             foundUser.Phone = updateUser.Phone ?? foundUser.Phone;
-            foundUser.Password = updateUser.Password ?? foundUser.Password;
+            foundUser.Password = foundUser.Password;
         }
         await _appDbContext.SaveChangesAsync();
         return foundUser;
