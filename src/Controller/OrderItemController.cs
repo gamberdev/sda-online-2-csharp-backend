@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
@@ -41,11 +42,13 @@ public class OrderItemController : ControllerBase
 
     [HttpGet("cart")]
     [Authorize]
-    public async Task<IActionResult> GetCartItem(Guid id)
+    public async Task<IActionResult> GetCartItem()
     {
         try
         {
-            var cartItems = await _orderItemService.GetCartItem(id);
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idUser = Guid.Parse(userIdString!);
+            var cartItems = await _orderItemService.GetCartItem(idUser);
 
             if (cartItems.Count() <= 0)
             {

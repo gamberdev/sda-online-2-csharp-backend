@@ -83,6 +83,9 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<OrderItemService>();
 builder.Services.AddScoped<ProductService>();
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>

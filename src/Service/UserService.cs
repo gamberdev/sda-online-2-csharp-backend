@@ -1,3 +1,5 @@
+using AutoMapper;
+using DB_EF.Models;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
@@ -10,32 +12,39 @@ public class UserService
 {
     private readonly AppDbContext _appDbContext;
     private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IMapper _mapper;
 
-    public UserService(AppDbContext appDbContext)
+    public UserService(AppDbContext appDbContext, IMapper mapper)
     {
         _appDbContext = appDbContext;
         _passwordHasher = new PasswordHasher<User>();
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<User>> GetUsers()
+    public async Task<IEnumerable<UserViewModel>> GetUsers()
     {
-        var users = await _appDbContext.Users
-        
-            .Include(u => u.Reviews)
+        var users = await _appDbContext
+            .Users.Include(u => u.Reviews)
             .Include(u => u.Orders)
             .Include(u => u.OrderItems)
             .ToListAsync();
-        return users;
+        var userDisplay = _mapper.Map<IEnumerable<UserViewModel>>(users);
+        return userDisplay;
     }
 
-    public async Task<User?> GetUserById(Guid id)
+    public async Task<UserViewModel?> GetUserById(Guid id)
     {
         var foundUser = await _appDbContext
             .Users.Include(u => u.Reviews)
             .Include(u => u.Orders)
             .Include(u => u.OrderItems)
             .FirstOrDefaultAsync(user => user.UserId == id);
-        return foundUser;
+        if (foundUser != null)
+        {
+            var user = _mapper.Map<UserViewModel>(foundUser);
+            return user;
+        }
+        return null;
     }
 
     public async Task<User?> SignIn(string email, string password)
@@ -53,8 +62,8 @@ public class UserService
         }
         throw new Exception("Unauthorize Access, incorrect Password for this email");
     }
-    
-    public async Task<UserModel> AddUser(UserModel newUser)
+
+    public async Task<UserViewModel> AddUser(UserModel newUser)
     {
         Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
         User user = new User
@@ -71,10 +80,11 @@ public class UserService
         user.Password = _passwordHasher.HashPassword(user, user.Password!);
         await _appDbContext.Users.AddAsync(user);
         await _appDbContext.SaveChangesAsync();
-        return newUser;
+        var userDisplay = _mapper.Map<UserViewModel>(user);
+        return userDisplay;
     }
 
-    public async Task<User?> UpdateUser(Guid id, UserModel updateUser)
+    public async Task<UserViewModel?> UpdateUser(Guid id, UserModel updateUser)
     {
         var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
         if (foundUser != null)
@@ -85,7 +95,8 @@ public class UserService
             foundUser.Password = foundUser.Password;
         }
         await _appDbContext.SaveChangesAsync();
-        return foundUser;
+        var userDisplay = _mapper.Map<UserViewModel>(foundUser);
+        return userDisplay;
     }
 
     public async Task<bool> DeleteUser(Guid id)

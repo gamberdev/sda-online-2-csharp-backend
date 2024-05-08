@@ -60,7 +60,6 @@ public class OrderController : ControllerBase
         }
     }
 
-
     [HttpGet("userOrder")]
     [Authorize]
     public async Task<IActionResult> GetUserOrder()
@@ -74,7 +73,6 @@ public class OrderController : ControllerBase
             {
                 return ApiResponse.NotFound("There is no orders found");
             }
-
             return ApiResponse.Success(foundUserOrders, "User's Orders is returned successfully");
         }
         catch (Exception ex)

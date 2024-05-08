@@ -34,12 +34,13 @@ public class OrderService
         return foundOrder;
     }
 
-     // Get User Orders by UserId
+    // Get User Orders by UserId
     public async Task<IEnumerable<Order>> GetUserOrder(Guid id)
     {
         var userOrder = await _appDbContext
-            .Orders
-            .Where(order => order.UserId == id).ToListAsync();
+            .Orders.Include(item => item.OrderItems)
+            .Where(order => order.UserId == id)
+            .ToListAsync();
         return userOrder;
     }
 

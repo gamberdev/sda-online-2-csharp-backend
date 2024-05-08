@@ -15,9 +15,9 @@ public class UserController : ControllerBase
     private readonly UserService _userService;
     private readonly AuthService _authService;
 
-    public UserController(AppDbContext appDbContext, AuthService authService)
+    public UserController(UserService userService, AuthService authService)
     {
-        _userService = new UserService(appDbContext);
+        _userService = userService;
         _authService = authService;
     }
 
@@ -90,8 +90,8 @@ public class UserController : ControllerBase
     {
         try
         {
-            await _userService.AddUser(newUser);
-            return ApiResponse.Created(newUser, "The user is Added");
+            var user = await _userService.AddUser(newUser);
+            return ApiResponse.Created(user, "The user is Added");
         }
         catch (DbUpdateException ex)
             when (ex.InnerException is Npgsql.PostgresException postgresException)
