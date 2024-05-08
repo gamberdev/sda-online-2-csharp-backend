@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ecommerce.Controller;
@@ -18,6 +20,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrders()
     {
         try
@@ -37,7 +40,8 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetOrder(Guid id)
     {
         try
@@ -56,7 +60,32 @@ public class OrderController : ControllerBase
         }
     }
 
+
+    [HttpGet("userOrder")]
+    [Authorize]
+    public async Task<IActionResult> GetUserOrder()
+    {
+        try
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idUser = Guid.Parse(userIdString!);
+            var foundUserOrders = await _orderService.GetUserOrder(idUser);
+            if (!foundUserOrders.Any())
+            {
+                return ApiResponse.NotFound("There is no orders found");
+            }
+
+            return ApiResponse.Success(foundUserOrders, "User's Orders is returned successfully");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
     [HttpPost]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> CreateOrder(OrderModel newOrder)
     {
         try
@@ -70,7 +99,9 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateOrder(Guid id, OrderModel updatedOrder)
     {
         try
@@ -88,7 +119,9 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteOrder(Guid id)
     {
         try
@@ -106,7 +139,9 @@ public class OrderController : ControllerBase
         }
     }
 
-    [HttpPut("{id}/cancel")]
+    [HttpPut("{id:guid}/cancel")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     //change order status to cancel by pass order id
     public async Task<IActionResult> CancelOrder(Guid id)
     {

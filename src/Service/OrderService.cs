@@ -34,6 +34,15 @@ public class OrderService
         return foundOrder;
     }
 
+     // Get User Orders by UserId
+    public async Task<IEnumerable<Order>> GetUserOrder(Guid id)
+    {
+        var userOrder = await _appDbContext
+            .Orders
+            .Where(order => order.UserId == id).ToListAsync();
+        return userOrder;
+    }
+
     // Create a new Order
     public async Task<OrderModel> CreateOrder(OrderModel newOrder)
     {
