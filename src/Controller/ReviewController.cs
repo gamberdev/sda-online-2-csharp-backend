@@ -3,6 +3,7 @@ using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ecommerce.Controller;
 
@@ -18,6 +19,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
+
     public async Task<IActionResult> GetReviews()
     {
         try
@@ -36,6 +38,8 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
+
     public async Task<IActionResult> GetReviewById(Guid id)
     {
         try
@@ -86,6 +90,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> DeleteReview(Guid id)
     {
         try
