@@ -19,8 +19,9 @@ public class UserService
 
     public async Task<IEnumerable<User>> GetUsers()
     {
-        var users = await _appDbContext
-            .Users.Include(u => u.Reviews)
+        var users = await _appDbContext.Users
+        
+            .Include(u => u.Reviews)
             .Include(u => u.Orders)
             .Include(u => u.OrderItems)
             .ToListAsync();
@@ -52,6 +53,7 @@ public class UserService
         }
         throw new Exception("Unauthorize Access, incorrect Password for this email");
     }
+    
 
     public async Task<UserModel> AddUser(UserModel newUser)
     {
