@@ -28,7 +28,6 @@ public class ProductService
     // Get product by ID
     public async Task<Product?> GetProductById(Guid id)
     {
-        var ProductsDb = _appDbContext.Products.ToList();
         var foundProduct = await _appDbContext
             .Products.Include(c => c.Category)
             .Include(r => r.Reviews)

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ecommerce.Models;
 using ecommerce.utils;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,4 @@
 using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;

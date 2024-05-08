@@ -2,8 +2,8 @@ using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ecommerce.Controller;
 
@@ -19,7 +19,6 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
-
     public async Task<IActionResult> GetReviews()
     {
         try
@@ -37,9 +36,8 @@ public class ReviewController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [Authorize]
-
     public async Task<IActionResult> GetReviewById(Guid id)
     {
         try
@@ -58,6 +56,8 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddReview(ReviewModel newReview)
     {
         try
@@ -71,7 +71,9 @@ public class ReviewController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "User")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateReview(Guid id, ReviewModel updateData)
     {
         try
@@ -89,8 +91,9 @@ public class ReviewController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteReview(Guid id)
     {
         try

@@ -1,11 +1,9 @@
 using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ecommerce.Controller;
 

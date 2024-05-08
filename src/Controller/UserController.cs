@@ -1,5 +1,4 @@
 using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -16,16 +15,14 @@ public class UserController : ControllerBase
     private readonly UserService _userService;
     private readonly AuthService _authService;
 
-   
-public UserController(AppDbContext appDbContext,AuthService authService)
+    public UserController(AppDbContext appDbContext, AuthService authService)
     {
         _userService = new UserService(appDbContext);
         _authService = authService;
-    }     
-    
+    }
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUsers()
     {
         try
@@ -37,14 +34,18 @@ public UserController(AppDbContext appDbContext,AuthService authService)
             }
             return ApiResponse.Success(users, "All users inside E-commerce system");
         }
+        catch (UnauthorizedAccessException)
+        {
+            return ApiResponse.Forbidden("Only admin can visit this route");
+        }
         catch (Exception)
         {
             return ApiResponse.ServerError("There is an error on getting the users");
         }
     }
 
-    [Authorize]
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserById(Guid id)
     {
         try
@@ -67,11 +68,11 @@ public UserController(AppDbContext appDbContext,AuthService authService)
     {
         try
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) )
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 return ApiResponse.BadRequest("User email and password required");
             }
-            
+
             var userSignIn = await _userService.SignIn(email, password);
             var token = _authService.GenerateJwt(userSignIn!);
             Console.WriteLine($"{token}");
@@ -105,7 +106,9 @@ public UserController(AppDbContext appDbContext,AuthService authService)
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateUser(Guid id, UserModel updateData)
     {
         try
@@ -123,7 +126,9 @@ public UserController(AppDbContext appDbContext,AuthService authService)
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         try

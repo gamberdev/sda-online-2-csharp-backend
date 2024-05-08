@@ -61,8 +61,8 @@ public class ReviewService
     public async Task<bool> DeleteReview(Guid id)
     {
         await Task.CompletedTask;
-        var ReviewDb = await _appDbContext.Reviews.ToListAsync();
-        var foundReview = ReviewDb.FirstOrDefault(review => review.ReviewId == id);
+        var reviewDb = await _appDbContext.Reviews.ToListAsync();
+        var foundReview = reviewDb.FirstOrDefault(review => review.ReviewId == id);
         if (foundReview != null)
         {
             _appDbContext.Reviews.Remove(foundReview);

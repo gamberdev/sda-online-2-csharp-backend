@@ -2,8 +2,8 @@ using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ecommerce.Controller;
 
@@ -17,7 +17,7 @@ public class OrderItemController : ControllerBase
     {
         _orderItemService = new OrderItemService(appDbContext);
     }
-    
+
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrderItems()
@@ -38,8 +38,9 @@ public class OrderItemController : ControllerBase
             return ApiResponse.ServerError("There is an error on getting the orderItems");
         }
     }
-    [Authorize]
+
     [HttpGet("cart")]
+    [Authorize]
     public async Task<IActionResult> GetCartItem(Guid id)
     {
         try
@@ -58,7 +59,7 @@ public class OrderItemController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetOrderItemById(Guid id)
     {
         try
@@ -78,6 +79,8 @@ public class OrderItemController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddOrderItem(OrderItemModel newOrderItem)
     {
         try
@@ -96,7 +99,9 @@ public class OrderItemController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateOrderItem(Guid id, OrderItemModel updateData)
     {
         try
@@ -114,7 +119,9 @@ public class OrderItemController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [Authorize]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteOrderItem(Guid id)
     {
         try

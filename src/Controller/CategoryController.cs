@@ -2,6 +2,7 @@ using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,8 @@ public class CategoryController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetCategoryById(Guid id)
     {
         try
@@ -60,12 +62,14 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddCategory(CategoryModel newCategory)
     {
         try
         {
-            var AddCategory = await _categoryService.AddCategory(newCategory);
-            return ApiResponse.Created(AddCategory, "The category is Added");
+            var addCategory = await _categoryService.AddCategory(newCategory);
+            return ApiResponse.Created(addCategory, "The category is Added");
         }
         catch (DbUpdateException ex)
             when (ex.InnerException is Npgsql.PostgresException postgresException)
@@ -80,7 +84,9 @@ public class CategoryController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateCategory(Guid id, CategoryModel updateData)
     {
         try
@@ -98,7 +104,9 @@ public class CategoryController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteCategory(Guid id)
     {
         try

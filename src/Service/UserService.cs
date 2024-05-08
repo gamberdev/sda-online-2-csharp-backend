@@ -54,7 +54,6 @@ public class UserService
         throw new Exception("Unauthorize Access, incorrect Password for this email");
     }
     
-
     public async Task<UserModel> AddUser(UserModel newUser)
     {
         Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
