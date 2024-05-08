@@ -3,6 +3,7 @@ using ecommerce.EntityFramework.Table;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,13 +14,18 @@ namespace ecommerce.Controller;
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
+    private readonly AuthService _authService;
 
-    public UserController(AppDbContext appDbContext)
+   
+public UserController(AppDbContext appDbContext,AuthService authService)
     {
         _userService = new UserService(appDbContext);
-    }
+        _authService = authService;
+    }     
+    
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetUsers()
     {
         try
@@ -37,6 +43,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(Guid id)
     {
@@ -60,8 +67,16 @@ public class UserController : ControllerBase
     {
         try
         {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) )
+            {
+                return ApiResponse.BadRequest("User email and password required");
+            }
+            
             var userSignIn = await _userService.SignIn(email, password);
-            return ApiResponse.Success(userSignIn, "User is SignIn successfully");
+            var token = _authService.GenerateJwt(userSignIn!);
+            Console.WriteLine($"{token}");
+
+            return ApiResponse.Success(new { token, userSignIn }, "User is SignIn successfully");
         }
         catch (Exception ex)
         {
