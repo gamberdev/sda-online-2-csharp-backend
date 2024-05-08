@@ -3,6 +3,7 @@ using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ecommerce.Controller;
 
@@ -16,8 +17,9 @@ public class OrderItemController : ControllerBase
     {
         _orderItemService = new OrderItemService(appDbContext);
     }
-
+    
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrderItems()
     {
         try
@@ -36,7 +38,7 @@ public class OrderItemController : ControllerBase
             return ApiResponse.ServerError("There is an error on getting the orderItems");
         }
     }
-
+    [Authorize]
     [HttpGet("cart")]
     public async Task<IActionResult> GetCartItem(Guid id)
     {
