@@ -41,13 +41,6 @@ builder.Services.AddAuthorization(options =>
 
 
 
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowOrigin",
-        builder => builder.WithOrigins("http://example.com")); // Specify allowed origins
-});
-
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -118,19 +111,7 @@ if (app.Environment.IsDevelopment())
 // Exception handling middleware
 app.UseExceptionHandler("/error"); // Specify a custom error handling endpoint
 
-// Security headers
-app.Use(async (context, next) =>
-{
-    var headers = context.Response.Headers;
-    headers.Append("Content-Security-Policy", "...");
-    headers.Append("X-Content-Type-Options", "nosniff");
-    headers.Append("X-Frame-Options", "DENY");
-    await next();
-});
 
-
-// Health checks
-app.UseHealthChecks("/health");
 
 // Use authentication
 app.UseAuthentication();
@@ -144,13 +125,3 @@ app.UseHttpsRedirection();
 app.Run();
 
 
-
-// Use WithOrigins for CORS: If you need to enable CORS (Cross-Origin Resource Sharing), you can use the WithOrigins method to specify the allowed origins. This helps enhance security by restricting which origins can access your API.
-
-// Logging Configuration: Configure logging settings, especially in production environments, to capture errors and important information. This can be achieved by adding logging middleware and configuring log providers like Serilog or the built-in logging framework.
-
-// Exception Handling Middleware: Implement global exception handling middleware to catch unhandled exceptions and return appropriate error responses to clients. This ensures consistent error handling across the application.
-
-// Security Headers: Add security headers to enhance the security of your application. Headers like Content-Security-Policy, X-Content-Type-Options, and X-Frame-Options can help protect against common web vulnerabilities.
-
-// Health Checks: Implement health checks to monitor the health of your application. This can be useful for automated monitoring and alerting systems.
