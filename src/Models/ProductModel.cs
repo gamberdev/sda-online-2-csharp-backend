@@ -5,7 +5,7 @@ namespace ecommerce.Models;
 public class ProductModel
 {
     public Guid ProductId { get; set; }
-    
+
     [Required(ErrorMessage = "Product Name is required")]
     [MinLength(2, ErrorMessage = "Product Name should be at least 2 letter")]
     public string? Name { get; set; }

@@ -1,5 +1,4 @@
 using AutoMapper;
-using DB_EF.Models;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
 using ecommerce.Models;

@@ -18,7 +18,9 @@ public class OrderModel
     public DateTime OrderDate { get; set; }
     public DateTime DeliveryDate { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Delivery address is required.")]
+    [MaxLength(100, ErrorMessage = "Delivery address must be at most 100 characters.")]
+    
     public string? DeliveryAddress { get; set; }
 
     [Required]
