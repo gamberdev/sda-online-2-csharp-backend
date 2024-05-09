@@ -2,10 +2,9 @@ using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-
 
 namespace ecommerce.Controller;
 

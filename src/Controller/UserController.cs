@@ -145,4 +145,27 @@ public class UserController : ControllerBase
             return ApiResponse.ServerError("There is an error on deleting user");
         }
     }
+
+
+
+  [HttpPut("{id:guid}/status")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> UpdateUserStatus(Guid id, UserStatusUpdateModel statusUpdateModel)
+{
+    try
+    {
+        var updatedUser = await _userService.UpdateUserStatus(id, statusUpdateModel);
+        if (updatedUser == null)
+        {
+            return ApiResponse.NotFound("The user not found");
+        }
+        return ApiResponse.Success(updatedUser, "User status updated successfully");
+    }
+    catch (Exception)
+    {
+        return ApiResponse.ServerError("There is an error on updating user status");
+    }
+}
+ 
+
 }
