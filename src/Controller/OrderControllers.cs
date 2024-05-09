@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -23,62 +24,39 @@ public class OrderController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrders()
     {
-        try
-        {
-            var orders = await _orderService.GetAllOrders();
+        var orders = await _orderService.GetAllOrders();
 
-            if (orders.ToList().Count < 1)
-            {
-                return ApiResponse.NotFound("No orders found");
-            }
-
-            return ApiResponse.Success(orders, "All Orders are returned successfully");
-        }
-        catch (Exception ex)
+        if (orders.ToList().Count < 1)
         {
-            return ApiResponse.ServerError(ex.Message);
+            throw new NotFoundException("No orders found");
         }
+
+        return ApiResponse.Success(orders, "All Orders are returned successfully");
     }
 
     [HttpGet("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetOrder(Guid id)
     {
-        try
-        {
-            var foundOrder = await _orderService.GetOrderById(id);
-            if (foundOrder == null)
-            {
-                return ApiResponse.NotFound("The order not found");
-            }
+        var foundOrder =
+            await _orderService.GetOrderById(id)
+            ?? throw new NotFoundException("The order not found");
 
-            return ApiResponse.Success(foundOrder, "Order is returned successfully");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(foundOrder, "Order is returned successfully");
     }
 
     [HttpGet("userOrder")]
     [Authorize]
     public async Task<IActionResult> GetUserOrder()
     {
-        try
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var idUser = Guid.Parse(userIdString!);
+        var foundUserOrders = await _orderService.GetUserOrder(idUser);
+        if (!foundUserOrders.Any())
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var idUser = Guid.Parse(userIdString!);
-            var foundUserOrders = await _orderService.GetUserOrder(idUser);
-            if (!foundUserOrders.Any())
-            {
-                return ApiResponse.NotFound("There is no orders found");
-            }
-            return ApiResponse.Success(foundUserOrders, "User's Orders is returned successfully");
+            throw new NotFoundException("There is no orders yet!");
         }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(foundUserOrders, "User's Orders is returned successfully");
     }
 
     [HttpPost]
@@ -86,18 +64,11 @@ public class OrderController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddOrder(OrderModel newOrder)
     {
-        try
-        {
-            //identify id depend on the login user
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            newOrder.UserId = Guid.Parse(userIdString!);
-            await _orderService.AddOrder(newOrder);
-            return ApiResponse.Created(newOrder, "The order is Added");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        //identify id depend on the login user
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        newOrder.UserId = Guid.Parse(userIdString!);
+        await _orderService.AddOrder(newOrder);
+        return ApiResponse.Created(newOrder, "The order is Added");
     }
 
     [HttpPut("{id:guid}")]
@@ -105,19 +76,11 @@ public class OrderController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateOrder(Guid id, OrderModel updatedOrder)
     {
-        try
-        {
-            var found = await _orderService.UpdateOrder(id, updatedOrder);
-            if (found == null)
-            {
-                return ApiResponse.NotFound("The order not found");
-            }
-            return ApiResponse.Success(found, "Order is updated");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        var found =
+            await _orderService.UpdateOrder(id, updatedOrder)
+            ?? throw new NotFoundException("The order not found");
+
+        return ApiResponse.Success(found, "Order is updated");
     }
 
     [HttpDelete("{id:guid}")]
@@ -125,19 +88,12 @@ public class OrderController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteOrder(Guid id)
     {
-        try
+        var deleted = await _orderService.DeleteOrder(id);
+        if (!deleted)
         {
-            var deleted = await _orderService.DeleteOrder(id);
-            if (!deleted)
-            {
-                return ApiResponse.NotFound("The Order not found");
-            }
-            return ApiResponse.Success(id, "Order Deleted");
+            throw new NotFoundException("The Order not found");
         }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(id, "Order Deleted");
     }
 
     [HttpPut("{id:guid}/cancel")]
@@ -146,18 +102,11 @@ public class OrderController : ControllerBase
     //change order status to cancel by pass order id
     public async Task<IActionResult> CancelOrder(Guid id)
     {
-        try
+        var canceled = await _orderService.CancelOrder(id);
+        if (!canceled)
         {
-            var canceled = await _orderService.CancelOrder(id);
-            if (!canceled)
-            {
-                return ApiResponse.NotFound("The order not found");
-            }
-            return ApiResponse.Success(id, "Order Canceled");
+            throw new BadRequestException("There is no order with this ID to cancel");
         }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(id, "Order Canceled");
     }
 }

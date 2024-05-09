@@ -1,4 +1,5 @@
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -25,83 +26,43 @@ public class UserController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int limit = 5)
     {
-        try
+        var users = await _userService.GetUsers();
+        if (!users.Any())
         {
-            var users = await _userService.GetUsers();
-            if (users.Count() <= 0)
-            {
-                return ApiResponse.NotFound("There is no users");
-            }
-            return ApiResponse.Success(
-                users.Skip((page - 1) * limit).Take(limit).ToList(),
-                "All users inside E-commerce system"
-            );
+            throw new NotFoundException("There is no users");
         }
-        catch (UnauthorizedAccessException)
-        {
-            return ApiResponse.Forbidden("Only admin can visit this route");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on getting the users");
-        }
+
+        return ApiResponse.Success(
+            users.Skip((page - 1) * limit).Take(limit).ToList(),
+            "All users inside E-commerce system"
+        );
     }
 
     [HttpGet("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserById(Guid id)
     {
-        try
-        {
-            var found = await _userService.GetUserById(id);
-            if (found == null)
-            {
-                return ApiResponse.BadRequest("The user not found");
-            }
-            return ApiResponse.Success(found, "User Detail");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on getting the user");
-        }
+        var found =
+            await _userService.GetUserById(id) ?? throw new NotFoundException("The user not found");
+
+        return ApiResponse.Success(found, "User Detail");
     }
 
     [HttpPost("signIn")]
     public async Task<IActionResult> SignIn(SignIn signInInfo)
     {
-        try
-        {
-            var userSignIn = await _userService.SignIn(signInInfo);
-            var token = _authService.GenerateJwt(userSignIn!);
-            Console.WriteLine($"{token}");
+        var userSignIn = await _userService.SignIn(signInInfo);
+        var token = _authService.GenerateJwt(userSignIn!);
+        Console.WriteLine($"{token}");
 
-            return ApiResponse.Success(new { token, userSignIn }, "User is SignIn successfully");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.UnAuthorized(ex.Message);
-        }
+        return ApiResponse.Success(new { token, userSignIn }, "User is SignIn successfully");
     }
 
     [HttpPost("signUp")]
     public async Task<IActionResult> CreateAccount(UserModel newUser)
     {
-        try
-        {
-            var user = await _userService.CreateAccount(newUser);
-            return ApiResponse.Created(user, "The user is Added");
-        }
-        catch (DbUpdateException ex)
-            when (ex.InnerException is Npgsql.PostgresException postgresException)
-        {
-            if (postgresException.SqlState == "23505")
-            {
-                return ApiResponse.Conflict(
-                    "Duplicate email/phone. User with email/phone already exists"
-                );
-            }
-            return ApiResponse.ServerError("Cannot add the user");
-        }
+        var user = await _userService.CreateAccount(newUser);
+        return ApiResponse.Created(user, "The user is Added");
     }
 
     [HttpPut("{id:guid}")]
@@ -109,60 +70,38 @@ public class UserController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateUser(Guid id, UserModel updateData)
     {
-        try
-        {
-            var found = await _userService.UpdateUser(id, updateData);
-            if (found == null)
-            {
-                return ApiResponse.NotFound("The user not found");
-            }
-            return ApiResponse.Success(found, "User updated");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on updating user");
-        }
+        var found =
+            await _userService.UpdateUser(id, updateData)
+            ?? throw new NotFoundException("The user not found");
+
+        return ApiResponse.Success(found, "User updated");
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
-        try
+        var deleted = await _userService.DeleteUser(id);
+        if (!deleted)
         {
-            var deleted = await _userService.DeleteUser(id);
-            if (!deleted)
-            {
-                return ApiResponse.NotFound("The user not found");
-            }
-            return ApiResponse.Success(id, "User Deleted");
+            throw new NotFoundException("The user not found");
         }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on deleting user");
-        }
+        return ApiResponse.Success(id, "User Deleted");
     }
 
     [HttpPut("{id:guid}/status")]
     [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateUserStatus(
         Guid id,
         UserStatusUpdateModel statusUpdateModel
     )
     {
-        try
-        {
-            var updatedUser = await _userService.UpdateUserStatus(id, statusUpdateModel);
-            if (updatedUser == null)
-            {
-                return ApiResponse.NotFound("The user not found");
-            }
-            return ApiResponse.Success(updatedUser, "User status updated successfully");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on updating user status");
-        }
+        var updatedUser =
+            await _userService.UpdateUserStatus(id, statusUpdateModel)
+            ?? throw new NotFoundException("The user not found");
+
+        return ApiResponse.Success(updatedUser, "User status updated successfully");
     }
 }

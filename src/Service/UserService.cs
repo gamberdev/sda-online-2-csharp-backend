@@ -63,7 +63,7 @@ public class UserService
         {
             return loginUser;
         }
-        throw new Exception("Unauthorize Access, incorrect Password for this email");
+        throw new UnauthorizedAccessException("Unauthorize Access, incorrect Password for this email");
     }
 
     public async Task<UserViewModel> CreateAccount(UserModel newUser)

@@ -75,13 +75,13 @@ public class OrderService
         //save total value
         order.TotalPrice = total;
 
-        if (foundOrderItems.Any())
+        if (foundOrderItems.Count > 0)
         {
             await _appDbContext.Orders.AddAsync(order);
             await _appDbContext.SaveChangesAsync();
             return newOrder;
         }
-        throw new Exception("There is a problem on Add Order");
+        throw new InvalidOperationException("There is a problem on Add Order");
     }
 
     // Update an existing order

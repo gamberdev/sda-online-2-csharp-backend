@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -22,37 +23,23 @@ public class ReviewController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetReviews()
     {
-        try
+        var reviews = await _reviewService.GetReviews();
+        if (!reviews.Any())
         {
-            var reviews = await _reviewService.GetReviews();
-            if (reviews.Count() <= 0)
-            {
-                return ApiResponse.NotFound("There is no Reviews");
-            }
-            return ApiResponse.Success(reviews, "All Reviews inside E-commerce system");
+            throw new NotFoundException("There is no Reviews");
         }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on getting the Reviews");
-        }
+
+        return ApiResponse.Success(reviews, "All Reviews inside E-commerce system");
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetReviewById(Guid id)
     {
-        try
-        {
-            var foundReview = await _reviewService.GetReviewById(id);
-            if (foundReview == null)
-            {
-                return ApiResponse.BadRequest("The Review not found");
-            }
-            return ApiResponse.Success(foundReview, "Review Detail");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on getting the Review");
-        }
+        var foundReview =
+            await _reviewService.GetReviewById(id)
+            ?? throw new NotFoundException("The Review not found");
+
+        return ApiResponse.Success(foundReview, "Review Detail");
     }
 
     [HttpPost]
@@ -60,19 +47,12 @@ public class ReviewController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddReview(ReviewModel newReview)
     {
-        try
-        {
-            //identify id depend on the login user
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            newReview.UserId = Guid.Parse(userIdString!);
-            
-            await _reviewService.AddReview(newReview);
-            return ApiResponse.Created(newReview, "The Review is Added");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("Cannot add the Review");
-        }
+        //identify id depend on the login user
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        newReview.UserId = Guid.Parse(userIdString!);
+
+        await _reviewService.AddReview(newReview);
+        return ApiResponse.Created(newReview, "The Review is Added");
     }
 
     [HttpPut("{id:guid}")]
@@ -80,19 +60,11 @@ public class ReviewController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateReview(Guid id, ReviewModel updateData)
     {
-        try
-        {
-            var found = await _reviewService.UpdateReview(id, updateData);
-            if (found == null)
-            {
-                return ApiResponse.NotFound("The Review not found");
-            }
-            return ApiResponse.Success(found, "Review updated");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on updating Review");
-        }
+        var found =
+            await _reviewService.UpdateReview(id, updateData)
+            ?? throw new NotFoundException("The Review not found");
+
+        return ApiResponse.Success(found, "Review updated");
     }
 
     [HttpDelete("{id:guid}")]
@@ -100,18 +72,11 @@ public class ReviewController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteReview(Guid id)
     {
-        try
+        var deleted = await _reviewService.DeleteReview(id);
+        if (!deleted)
         {
-            var deleted = await _reviewService.DeleteReview(id);
-            if (!deleted)
-            {
-                return ApiResponse.NotFound("The Review not found");
-            }
-            return ApiResponse.Success(id, "Review Deleted");
+            throw new NotFoundException("The Review not found");
         }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on deleting Review");
-        }
+        return ApiResponse.Success(id, "Review Deleted");
     }
 }

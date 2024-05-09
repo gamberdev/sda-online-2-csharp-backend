@@ -1,4 +1,5 @@
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -22,42 +23,26 @@ public class CategoryController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCategories()
     {
-        try
+        var categories = await _categoryService.GetCategories();
+        if (!categories.Any())
         {
-            var categories = await _categoryService.GetCategories();
-            if (categories.Count() <= 0)
-            {
-                return ApiResponse.NotFound("There is no categories found");
-            }
+            throw new NotFoundException("There is no categories found");
+        }
 
-            return ApiResponse.Success(
-                categories,
-                "All categories inside E-commerce system are returned"
-            );
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(
+            categories,
+            "All categories inside E-commerce system are returned"
+        );
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetCategoryById(Guid id)
     {
-        try
-        {
-            var foundCategory = await _categoryService.GetCategoryById(id);
-            if (foundCategory == null)
-            {
-                return ApiResponse.NotFound("There is no category found matching");
-            }
+        var foundCategory =
+            await _categoryService.GetCategoryById(id)
+            ?? throw new NotFoundException("There is no category found matching");
 
-            return ApiResponse.Success(foundCategory, "Category are returned successfully");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(foundCategory, "Category are returned successfully");
     }
 
     [HttpPost]
@@ -65,22 +50,8 @@ public class CategoryController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddCategory(CategoryModel newCategory)
     {
-        try
-        {
-            var addCategory = await _categoryService.AddCategory(newCategory);
-            return ApiResponse.Created(addCategory, "The category is Added");
-        }
-        catch (DbUpdateException ex)
-            when (ex.InnerException is Npgsql.PostgresException postgresException)
-        {
-            if (postgresException.SqlState == "23505")
-            {
-                return ApiResponse.Conflict(
-                    "Duplicate Name. Category with this name is already exist"
-                );
-            }
-            return ApiResponse.ServerError("An error occurred while creating the category");
-        }
+        var addCategory = await _categoryService.AddCategory(newCategory);
+        return ApiResponse.Created(addCategory, "The category is Added");
     }
 
     [HttpPut("{id:guid}")]
@@ -88,19 +59,11 @@ public class CategoryController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateCategory(Guid id, CategoryModel updateData)
     {
-        try
-        {
-            var found = await _categoryService.UpdateCategoryName(id, updateData);
-            if (found == null)
-            {
-                return ApiResponse.NotFound("The category not found");
-            }
-            return ApiResponse.Success(found, "Category are updated successfully");
-        }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        var found =
+            await _categoryService.UpdateCategoryName(id, updateData)
+            ?? throw new NotFoundException("The category not found");
+
+        return ApiResponse.Success(found, "Category are updated successfully");
     }
 
     [HttpDelete("{id:guid}")]
@@ -108,18 +71,11 @@ public class CategoryController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteCategory(Guid id)
     {
-        try
+        var deleted = await _categoryService.DeleteCategory(id);
+        if (!deleted)
         {
-            var deleted = await _categoryService.DeleteCategory(id);
-            if (!deleted)
-            {
-                return ApiResponse.NotFound("The category not found");
-            }
-            return ApiResponse.Success(id, "Category are Deleted successfully");
+            throw new NotFoundException("The category not found");
         }
-        catch (Exception ex)
-        {
-            return ApiResponse.ServerError(ex.Message);
-        }
+        return ApiResponse.Success(id, "Category are Deleted successfully");
     }
 }

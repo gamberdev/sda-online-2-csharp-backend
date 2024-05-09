@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +114,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Run the application
 app.Run();

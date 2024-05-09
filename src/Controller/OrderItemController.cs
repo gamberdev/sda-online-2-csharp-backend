@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ecommerce.EntityFramework;
+using ecommerce.Middleware;
 using ecommerce.Models;
 using ecommerce.service;
 using ecommerce.utils;
@@ -23,62 +24,38 @@ public class OrderItemController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrderItems()
     {
-        try
-        {
-            var orderItems = await _orderItemService.GetAllOrderItems();
+        var orderItems = await _orderItemService.GetAllOrderItems();
 
-            if (orderItems.Count() <= 0)
-            {
-                return ApiResponse.NotFound("There is no orderItems");
-            }
-            return ApiResponse.Success(orderItems, "All orderItems inside E-commerce system");
-        }
-        catch (Exception)
+        if (!orderItems.Any())
         {
-            Console.Write($"An error occurred while retrieving all orderItems");
-            return ApiResponse.ServerError("There is an error on getting the orderItems");
+            throw new NotFoundException("There is no orderItems");
         }
+        return ApiResponse.Success(orderItems, "All orderItems inside E-commerce system");
     }
 
     [HttpGet("cart")]
     [Authorize]
     public async Task<IActionResult> GetCartItem()
     {
-        try
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var idUser = Guid.Parse(userIdString!);
-            var cartItems = await _orderItemService.GetCartItem(idUser);
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var idUser = Guid.Parse(userIdString!);
+        var cartItems = await _orderItemService.GetCartItem(idUser);
 
-            if (cartItems.Count() <= 0)
-            {
-                return ApiResponse.NotFound("The Cart is Empty");
-            }
-            return ApiResponse.Success(cartItems, "All cartItems for the current user");
-        }
-        catch (Exception)
+        if (!cartItems.Any())
         {
-            return ApiResponse.ServerError("There is an error on getting the cartItems");
+            throw new NotFoundException("The Cart is Empty!");
         }
+        return ApiResponse.Success(cartItems, "All cartItems for the current user");
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetOrderItemById(Guid id)
     {
-        try
-        {
-            var orderItem = await _orderItemService.GetOrderItemById(id);
-            if (orderItem == null)
-            {
-                return ApiResponse.BadRequest("The orderItem not found");
-            }
-            return ApiResponse.Success(orderItem, "orderItem Detail");
-        }
-        catch (Exception)
-        {
-            Console.Write($"An error occurred while retrieving the orderItem");
-            return ApiResponse.ServerError("There is an error on getting the orderItem");
-        }
+        var orderItem =
+            await _orderItemService.GetOrderItemById(id)
+            ?? throw new BadRequestException("The entered orderItem is not in the system");
+
+        return ApiResponse.Success(orderItem, "orderItem Detail");
     }
 
     [HttpPost]
@@ -86,23 +63,11 @@ public class OrderItemController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> AddOrderItem(OrderItemModel newOrderItem)
     {
-        try
-        {
-            //identify id depend on the login user
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            newOrderItem.UserId = Guid.Parse(userIdString!);
-            await _orderItemService.AddOrderItem(newOrderItem);
-            return ApiResponse.Created(newOrderItem, "The OrderItem is Added");
-        }
-        catch (InvalidOperationException ex)
-        {
-            return ApiResponse.BadRequest(ex.Message);
-        }
-        catch (Exception)
-        {
-            Console.Write($"An error occurred while creating the orderItem");
-            return ApiResponse.ServerError("Cannot add the OrderItem");
-        }
+        //identify id depend on the login user
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        newOrderItem.UserId = Guid.Parse(userIdString!);
+        await _orderItemService.AddOrderItem(newOrderItem);
+        return ApiResponse.Created(newOrderItem, "The OrderItem is Added");
     }
 
     [HttpPut("{id:guid}")]
@@ -110,19 +75,11 @@ public class OrderItemController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateOrderItem(Guid id, OrderItemModel updateData)
     {
-        try
-        {
-            var found = await _orderItemService.UpdateOrderItem(id, updateData);
-            if (found == null)
-            {
-                return ApiResponse.NotFound("The OrderItem not found");
-            }
-            return ApiResponse.Success(found, "OrderItem updated");
-        }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on updating OrderItem");
-        }
+        var found =
+            await _orderItemService.UpdateOrderItem(id, updateData)
+            ?? throw new NotFoundException("The OrderItem not found");
+
+        return ApiResponse.Success(found, "OrderItem updated");
     }
 
     [HttpDelete("{id:guid}")]
@@ -130,18 +87,11 @@ public class OrderItemController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteOrderItem(Guid id)
     {
-        try
+        var deleted = await _orderItemService.DeleteOrderItem(id);
+        if (!deleted)
         {
-            var deleted = await _orderItemService.DeleteOrderItem(id);
-            if (!deleted)
-            {
-                return ApiResponse.NotFound("The OrderItem not found");
-            }
-            return ApiResponse.Success(id, "OrderItem Deleted");
+            throw new NotFoundException("The OrderItem not found");
         }
-        catch (Exception)
-        {
-            return ApiResponse.ServerError("There is an error on deleting OrderItem");
-        }
+        return ApiResponse.Success(id, "OrderItem Deleted");
     }
 }
