@@ -112,28 +112,26 @@ public class UserService
     }
 
 
-
-    public async Task<UserViewModel?> ToggleUserBannedStatus(Guid id, bool isBanned)
+public async Task<UserViewModel?> UpdateUserStatus(Guid id, UserStatusUpdateModel statusUpdateModel)
+{
+    var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
+    if (foundUser != null)
     {
-        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
-        if (foundUser != null)
+        // Update banned status if provided
+        if (statusUpdateModel.IsBanned.HasValue)
         {
-            foundUser.IsBanned = isBanned;
-            await _appDbContext.SaveChangesAsync();
+            foundUser.IsBanned = statusUpdateModel.IsBanned.Value;
         }
-        var userDisplay = _mapper.Map<UserViewModel>(foundUser);
-        return userDisplay;
-    }
 
-    public async Task<UserViewModel?> ChangeUserRole(Guid id, Role role)
-    {
-        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
-        if (foundUser != null)
+        // Update role if provided
+        if (statusUpdateModel.Role.HasValue)
         {
-            foundUser.Role = role;
-            await _appDbContext.SaveChangesAsync();
+            foundUser.Role = statusUpdateModel.Role.Value;
         }
-        var userDisplay = _mapper.Map<UserViewModel>(foundUser);
-        return userDisplay;
+
+        await _appDbContext.SaveChangesAsync();
     }
+    var userDisplay = _mapper.Map<UserViewModel>(foundUser);
+    return userDisplay;
+}
 }
