@@ -145,4 +145,45 @@ public class UserController : ControllerBase
             return ApiResponse.ServerError("There is an error on deleting user");
         }
     }
+
+
+
+    [HttpPut("{id:guid}/banned")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ToggleUserBannedStatus(Guid id, bool isBanned)
+    {
+        try
+        {
+            var foundUser = await _userService.ToggleUserBannedStatus(id, isBanned);
+            if (foundUser == null)
+            {
+                return ApiResponse.NotFound("The user not found");
+            }
+            return ApiResponse.Success(foundUser, "User banned status updated");
+        }
+        catch (Exception)
+        {
+            return ApiResponse.ServerError("There is an error on updating user banned status");
+        }
+    }
+
+    [HttpPut("{id:guid}/role")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangeUserRole(Guid id, Role role)
+    {
+        try
+        {
+            var foundUser = await _userService.ChangeUserRole(id, role);
+            if (foundUser == null)
+            {
+                return ApiResponse.NotFound("The user not found");
+            }
+            return ApiResponse.Success(foundUser, "User role updated");
+        }
+        catch (Exception)
+        {
+            return ApiResponse.ServerError("There is an error on updating user role");
+        }
+    }
+
 }

@@ -110,4 +110,30 @@ public class UserService
         }
         return false;
     }
+
+
+
+    public async Task<UserViewModel?> ToggleUserBannedStatus(Guid id, bool isBanned)
+    {
+        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
+        if (foundUser != null)
+        {
+            foundUser.IsBanned = isBanned;
+            await _appDbContext.SaveChangesAsync();
+        }
+        var userDisplay = _mapper.Map<UserViewModel>(foundUser);
+        return userDisplay;
+    }
+
+    public async Task<UserViewModel?> ChangeUserRole(Guid id, Role role)
+    {
+        var foundUser = await _appDbContext.Users.FirstOrDefaultAsync(user => user.UserId == id);
+        if (foundUser != null)
+        {
+            foundUser.Role = role;
+            await _appDbContext.SaveChangesAsync();
+        }
+        var userDisplay = _mapper.Map<UserViewModel>(foundUser);
+        return userDisplay;
+    }
 }
