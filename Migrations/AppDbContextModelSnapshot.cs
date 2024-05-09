@@ -31,7 +31,6 @@ namespace Backend.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-
                         .HasColumnType("text")
                         .HasColumnName("category_name");
 
@@ -60,9 +59,7 @@ namespace Backend.Migrations
 
                     b.Property<string>("DeliveryAddress")
                         .IsRequired()
-
                         .HasColumnType("text")
-
                         .HasColumnName("delivery_address");
 
                     b.Property<DateTime>("DeliveryDate")

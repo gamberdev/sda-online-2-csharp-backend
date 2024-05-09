@@ -144,11 +144,11 @@ public class ProductController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [Authorize(Policy = "RequiredNotBanned")]
-    public async Task<IActionResult> CreateProduct(ProductModel newProduct)
+    public async Task<IActionResult> AddProduct(ProductModel newProduct)
     {
         try
         {
-            var AddProduct = await _productService.CreateProduct(newProduct);
+            var AddProduct = await _productService.AddProduct(newProduct);
             return ApiResponse.Created(AddProduct, "The product is Added");
         }
         catch (DbUpdateException ex)
