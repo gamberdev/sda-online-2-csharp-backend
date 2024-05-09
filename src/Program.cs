@@ -40,6 +40,9 @@ builder.Services.AddAuthorization(options =>
 });
 
 
+
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
@@ -102,7 +105,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
+
+// Exception handling middleware
+app.UseExceptionHandler("/error"); // Specify a custom error handling endpoint
+
+
+
+// Use authentication
+app.UseAuthentication();
+
+
+
 app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();
 
+// Run the application
 app.Run();
+
+

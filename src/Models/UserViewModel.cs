@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DB_EF.Models;
+namespace ecommerce.Models;
 
 public class UserViewModel
 {
