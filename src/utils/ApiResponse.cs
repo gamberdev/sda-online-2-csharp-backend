@@ -7,51 +7,58 @@ namespace ecommerce.utils
 
     public static class ApiResponse
     {
-
         public static IActionResult Success<T>(T data, string message = "Success")
-        {        /// Generates a successful API response with the provided data and optional message.
+        {
+            /// Generates a successful API response with the provided data and optional message.
 
             return new ObjectResult(new ApiResponseTemplate<T>(true, data, message, 200));
         }
 
         public static IActionResult Created<T>(T data, string message = "Resource Created")
-        {        /// Generates a successful API response for resource creation with the provided data and optional message.
+        {
+            /// Generates a successful API response for resource creation with the provided data and optional message.
 
             return new ObjectResult(new ApiResponseTemplate<T>(true, data, message, 201));
         }
 
         public static IActionResult NotFound(string message = "Resource not found")
-        {        /// Generates a "Not Found" API response with the provided message.
+        {
+            /// Generates a "Not Found" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 404));
         }
 
         public static IActionResult Conflict(string message = "Conflict Detected")
-        {        /// Generates a "Conflict" API response with the provided message.
+        {
+            /// Generates a "Conflict" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 409));
         }
 
         public static IActionResult BadRequest(string message = "Bad request")
-        {        /// Generates a "Bad Request" API response with the provided message.
+        {
+            /// Generates a "Bad Request" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 400));
         }
 
         public static IActionResult UnAuthorized(string message = "Unauthorized access")
-        {        /// Generates an "Unauthorized" API response with the provided message.
+        {
+            /// Generates an "Unauthorized" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 401));
         }
 
         public static IActionResult Forbidden(string message = "Forbidden access")
-        {        /// Generates a "Forbidden" API response with the provided message.
+        {
+            /// Generates a "Forbidden" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 403));
         }
 
         public static IActionResult ServerError(string message = "Internal server error")
-        {        /// Generates a "Server Error" API response with the provided message.
+        {
+            /// Generates a "Server Error" API response with the provided message.
 
             return new ObjectResult(new ApiResponseTemplate<object>(false, "", message, 500));
         }
@@ -68,6 +75,7 @@ namespace ecommerce.utils
 
         /// A message providing additional information about the response.
         public string Message { get; set; }
+
         /// The status code of the API response.
         public int StatusCode { get; set; }
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ecommerce.EntityFramework;
 using ecommerce.Models;
 using ecommerce.service;
@@ -61,6 +62,10 @@ public class ReviewController : ControllerBase
     {
         try
         {
+            //identify id depend on the login user
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            newReview.UserId = Guid.Parse(userIdString!);
+            
             await _reviewService.AddReview(newReview);
             return ApiResponse.Created(newReview, "The Review is Added");
         }

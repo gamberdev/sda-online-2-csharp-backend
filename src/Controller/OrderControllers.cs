@@ -88,6 +88,9 @@ public class OrderController : ControllerBase
     {
         try
         {
+            //identify id depend on the login user
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            newOrder.UserId = Guid.Parse(userIdString!);
             await _orderService.AddOrder(newOrder);
             return ApiResponse.Created(newOrder, "The order is Added");
         }

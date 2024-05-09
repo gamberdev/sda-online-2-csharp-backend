@@ -87,6 +87,11 @@ public class ProductController : ControllerBase
                     break;
             }
 
+            if (!products.Any())
+            {
+                return ApiResponse.NotFound("No products found matching the sort/filter criteria.");
+            }
+
             // Apply pagination
             var paginatedProducts = products.Skip((page - 1) * limit).Take(limit).ToList();
 

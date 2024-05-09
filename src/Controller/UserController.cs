@@ -23,7 +23,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetUsers()
+    public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int limit = 5)
     {
         try
         {
@@ -32,7 +32,10 @@ public class UserController : ControllerBase
             {
                 return ApiResponse.NotFound("There is no users");
             }
-            return ApiResponse.Success(users, "All users inside E-commerce system");
+            return ApiResponse.Success(
+                users.Skip((page - 1) * limit).Take(limit).ToList(),
+                "All users inside E-commerce system"
+            );
         }
         catch (UnauthorizedAccessException)
         {
