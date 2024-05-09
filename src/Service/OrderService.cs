@@ -45,7 +45,7 @@ public class OrderService
     }
 
     // Create a new Order
-    public async Task<OrderModel> CreateOrder(OrderModel newOrder)
+    public async Task<OrderModel> AddOrder(OrderModel newOrder)
     {
         double total = 0;
         //found ordered items

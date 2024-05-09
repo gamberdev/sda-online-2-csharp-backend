@@ -80,12 +80,12 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddUser(UserModel newUser)
+    [HttpPost("signUp")]
+    public async Task<IActionResult> CreateAccount(UserModel newUser)
     {
         try
         {
-            var user = await _userService.AddUser(newUser);
+            var user = await _userService.CreateAccount(newUser);
             return ApiResponse.Created(user, "The user is Added");
         }
         catch (DbUpdateException ex)

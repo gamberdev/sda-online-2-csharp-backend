@@ -84,11 +84,11 @@ public class OrderController : ControllerBase
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "RequiredNotBanned")]
-    public async Task<IActionResult> CreateOrder(OrderModel newOrder)
+    public async Task<IActionResult> AddOrder(OrderModel newOrder)
     {
         try
         {
-            await _orderService.CreateOrder(newOrder);
+            await _orderService.AddOrder(newOrder);
             return ApiResponse.Created(newOrder, "The order is Added");
         }
         catch (Exception ex)

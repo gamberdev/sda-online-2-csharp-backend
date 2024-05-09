@@ -49,7 +49,7 @@ public class ProductService
     }
 
     // Create a new product
-    public async Task<ProductModel> CreateProduct(ProductModel newProduct)
+    public async Task<ProductModel> AddProduct(ProductModel newProduct)
     {
         Product product = new Product
         {

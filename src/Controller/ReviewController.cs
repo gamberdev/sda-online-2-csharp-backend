@@ -71,7 +71,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "User")]
+    [Authorize]
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateReview(Guid id, ReviewModel updateData)
     {
