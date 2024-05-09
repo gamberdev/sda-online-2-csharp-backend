@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ecommerce.EntityFramework;
@@ -11,9 +12,11 @@ using ecommerce.EntityFramework;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240509072223_a")]
+    partial class a
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,9 @@ namespace Backend.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-
-                        .HasColumnType("text")
-                        .HasColumnName("category_name");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("Category_Name");
 
                     b.Property<string>("Slug")
                         .IsRequired()
@@ -60,9 +63,8 @@ namespace Backend.Migrations
 
                     b.Property<string>("DeliveryAddress")
                         .IsRequired()
-
-                        .HasColumnType("text")
-
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("delivery_address");
 
                     b.Property<DateTime>("DeliveryDate")
