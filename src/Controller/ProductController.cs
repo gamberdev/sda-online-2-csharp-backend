@@ -101,8 +101,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
-    [Authorize]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         try
@@ -165,7 +164,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
@@ -188,7 +187,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteProduct(Guid id)

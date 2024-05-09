@@ -42,7 +42,6 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize]
     public async Task<IActionResult> GetCategoryById(Guid id)
     {
         try

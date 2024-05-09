@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using ecommerce.EntityFramework;
-using ecommerce.EntityFramework.Table;
 using ecommerce.service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +46,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc(
+        "v1",
+        new OpenApiInfo
+        {
+            Title = "E_commerce system API",
+            Description =
+                "Experience the future of online shopping today with E-commerce API. Designed to provide services for the system's users to manage products, and categories and engage customers with good experience. The goal is to deliver the tools needed to elevate a good e-commerce platform and drive incomparable success.",
+            Version = "v1"
+        }
+    );
     c.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme
@@ -101,12 +110,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// Exception handling middleware
-app.UseExceptionHandler("/error");
-
-// Use authentication
-app.UseAuthentication();
 
 app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();

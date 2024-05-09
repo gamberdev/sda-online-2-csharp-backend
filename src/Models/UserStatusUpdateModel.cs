@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace ecommerce.Models;
 
-namespace ecommerce.Models
-{
    public class UserStatusUpdateModel
 {
     public bool? IsBanned { get; set; }
+
+    [ExistingRole(ErrorMessage = "Invalid role.")]
     public Role? Role { get; set; }
-}
 }

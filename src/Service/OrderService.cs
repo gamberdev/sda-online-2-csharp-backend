@@ -48,6 +48,7 @@ public class OrderService
     public async Task<OrderModel> CreateOrder(OrderModel newOrder)
     {
         double total = 0;
+        //found ordered items
         var foundOrderItems = await _appDbContext
             .OrderItems.Where(orderItem =>
                 orderItem.OrderId == null && orderItem.UserId == newOrder.UserId
@@ -64,12 +65,14 @@ public class OrderService
             DeliveryAddress = newOrder.DeliveryAddress ?? "",
             UserId = newOrder.UserId
         };
-
+         
+        //add cart item to that order 
         foreach (var orderItem in foundOrderItems)
         {
             orderItem.OrderId = order.OrderId;
             total += orderItem.Price * orderItem.Quantity;
         }
+        //save total value
         order.TotalPrice = total;
 
         if (foundOrderItems.Any())

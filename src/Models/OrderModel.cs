@@ -25,6 +25,8 @@ public class OrderModel
 
     [Required]
     public string PaymentMethod { get; set; } = string.Empty;
+
+    [ExistingOrderStatus(ErrorMessage = "Invalid order status.")]
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
     //Foreign Key

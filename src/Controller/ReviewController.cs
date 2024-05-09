@@ -37,7 +37,6 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize]
     public async Task<IActionResult> GetReviewById(Guid id)
     {
         try

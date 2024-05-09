@@ -64,16 +64,11 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("signIn")]
-    public async Task<IActionResult> SignIn(string email, string password)
+    public async Task<IActionResult> SignIn(SignIn signInInfo)
     {
         try
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            {
-                return ApiResponse.BadRequest("User email and password required");
-            }
-
-            var userSignIn = await _userService.SignIn(email, password);
+            var userSignIn = await _userService.SignIn(signInInfo);
             var token = _authService.GenerateJwt(userSignIn!);
             Console.WriteLine($"{token}");
 
@@ -146,26 +141,25 @@ public class UserController : ControllerBase
         }
     }
 
-
-
-  [HttpPut("{id:guid}/status")]
-[Authorize(Roles = "Admin")]
-public async Task<IActionResult> UpdateUserStatus(Guid id, UserStatusUpdateModel statusUpdateModel)
-{
-    try
+    [HttpPut("{id:guid}/status")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateUserStatus(
+        Guid id,
+        UserStatusUpdateModel statusUpdateModel
+    )
     {
-        var updatedUser = await _userService.UpdateUserStatus(id, statusUpdateModel);
-        if (updatedUser == null)
+        try
         {
-            return ApiResponse.NotFound("The user not found");
+            var updatedUser = await _userService.UpdateUserStatus(id, statusUpdateModel);
+            if (updatedUser == null)
+            {
+                return ApiResponse.NotFound("The user not found");
+            }
+            return ApiResponse.Success(updatedUser, "User status updated successfully");
         }
-        return ApiResponse.Success(updatedUser, "User status updated successfully");
+        catch (Exception)
+        {
+            return ApiResponse.ServerError("There is an error on updating user status");
+        }
     }
-    catch (Exception)
-    {
-        return ApiResponse.ServerError("There is an error on updating user status");
-    }
-}
- 
-
 }
