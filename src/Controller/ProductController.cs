@@ -4,6 +4,8 @@ using ecommerce.service;
 using ecommerce.utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace ecommerce.Controller;
 
@@ -101,6 +103,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         try
@@ -141,6 +144,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> CreateProduct(ProductModel newProduct)
     {
         try
@@ -162,6 +167,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateProduct(Guid id, ProductModel updatedProduct)
     {
         try
@@ -183,6 +190,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
         try
