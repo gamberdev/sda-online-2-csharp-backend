@@ -33,15 +33,12 @@ builder
             ClockSkew = TimeSpan.Zero
         };
     });
+
 // claim-based for banned user
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequiredNotBanned", policy => policy.RequireClaim("IsBanned", "false"));
 });
-
-
-
-
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -105,23 +102,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-
-
 // Exception handling middleware
-app.UseExceptionHandler("/error"); // Specify a custom error handling endpoint
-
-
+app.UseExceptionHandler("/error");
 
 // Use authentication
 app.UseAuthentication();
-
-
 
 app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();
 
 // Run the application
 app.Run();
-
-
