@@ -15,9 +15,9 @@ public class OrderItemController : ControllerBase
 {
     private readonly OrderItemService _orderItemService;
 
-    public OrderItemController(AppDbContext appDbContext)
+    public OrderItemController(OrderItemService orderItemService)
     {
-        _orderItemService = new OrderItemService(appDbContext);
+        _orderItemService = orderItemService;
     }
 
     [HttpGet]
@@ -49,6 +49,7 @@ public class OrderItemController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetOrderItemById(Guid id)
     {
         var orderItem =

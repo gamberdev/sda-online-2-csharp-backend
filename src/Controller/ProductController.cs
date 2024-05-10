@@ -9,27 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.Controller;
 
-public enum OrderBy
-{
-    ASC,
-    DESC
-}
-
-public enum SortBy
-{
-    Name,
-    Date
-}
-
 [ApiController]
 [Route("/products")]
 public class ProductController : ControllerBase
 {
     private readonly ProductService _productService;
 
-    public ProductController(AppDbContext appDbContext)
+    public ProductController(ProductService productService)
     {
-        _productService = new ProductService(appDbContext);
+        _productService = productService;
     }
 
     [HttpGet]

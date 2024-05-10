@@ -1,6 +1,6 @@
 namespace ecommerce.Models;
 
-   public class UserStatusUpdateModel
+public class UserStatusUpdateModel
 {
     public bool? IsBanned { get; set; }
 

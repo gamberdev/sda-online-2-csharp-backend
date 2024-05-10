@@ -15,9 +15,9 @@ public class OrderController : ControllerBase
 {
     private readonly OrderService _orderService;
 
-    public OrderController(AppDbContext appDbContext)
+    public OrderController(OrderService orderService)
     {
-        _orderService = new OrderService(appDbContext);
+        _orderService = orderService;
     }
 
     [HttpGet]

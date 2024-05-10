@@ -2,12 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ecommerce.Models;
 
-public enum Role
-{
-    Customer,
-    Admin
-}
-
 public class UserModel
 {
     public Guid UserId { get; set; }

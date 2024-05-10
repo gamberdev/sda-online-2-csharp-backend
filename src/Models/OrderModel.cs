@@ -2,14 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ecommerce.Models;
 
-public enum OrderStatus
-{
-    Pending,
-    Processing,
-    OutForDelivery,
-    Delivered,
-    Canceled
-}
 
 public class OrderModel
 {

@@ -15,9 +15,9 @@ public class ReviewController : ControllerBase
 {
     private readonly ReviewService _reviewService;
 
-    public ReviewController(AppDbContext appDbContext)
+    public ReviewController(ReviewService reviewService)
     {
-        _reviewService = new ReviewService(appDbContext);
+        _reviewService = reviewService;
     }
 
     [HttpGet]
@@ -60,9 +60,9 @@ public class ReviewController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> UpdateReview(Guid id, ReviewModel updateData)
     {
-        var found =
-            await _reviewService.UpdateReview(id, updateData)
-            ?? throw new NotFoundException("The Review not found");
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Guid userId = Guid.Parse(userIdString!);
+        var found = await _reviewService.UpdateReview(id, updateData, userId);
 
         return ApiResponse.Success(found, "Review updated");
     }
@@ -72,11 +72,9 @@ public class ReviewController : ControllerBase
     [Authorize(Policy = "RequiredNotBanned")]
     public async Task<IActionResult> DeleteReview(Guid id)
     {
-        var deleted = await _reviewService.DeleteReview(id);
-        if (!deleted)
-        {
-            throw new NotFoundException("The Review not found");
-        }
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Guid userId = Guid.Parse(userIdString!);
+        await _reviewService.DeleteReview(id, userId);
         return ApiResponse.Success(id, "Review Deleted");
     }
 }

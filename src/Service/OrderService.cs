@@ -81,7 +81,7 @@ public class OrderService
             await _appDbContext.SaveChangesAsync();
             return newOrder;
         }
-        throw new InvalidOperationException("There is a problem on Add Order");
+        throw new InvalidOperationException("There is a problem on Add Order, Cart is empty");
     }
 
     // Update an existing order

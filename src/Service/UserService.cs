@@ -63,7 +63,9 @@ public class UserService
         {
             return loginUser;
         }
-        throw new UnauthorizedAccessException("Unauthorize Access, incorrect Password for this email");
+        throw new UnauthorizedAccessException(
+            "Unauthorize Access, incorrect Password for this email"
+        );
     }
 
     public async Task<UserViewModel> CreateAccount(UserModel newUser)
@@ -95,7 +97,7 @@ public class UserService
             foundUser.FullName = updateUser.FullName ?? foundUser.FullName;
             foundUser.Email = updateUser.Email ?? foundUser.Email;
             foundUser.Phone = updateUser.Phone ?? foundUser.Phone;
-            foundUser.Password = foundUser.Password;
+            foundUser.Password = _passwordHasher.HashPassword(foundUser, updateUser.Password!);
         }
         await _appDbContext.SaveChangesAsync();
         var userDisplay = _mapper.Map<UserViewModel>(foundUser);

@@ -15,9 +15,9 @@ public class CategoryController : ControllerBase
 {
     private readonly CategoryService _categoryService;
 
-    public CategoryController(AppDbContext appDbContext)
+    public CategoryController(CategoryService categoryService)
     {
-        _categoryService = new CategoryService(appDbContext);
+        _categoryService = categoryService;
     }
 
     [HttpGet]

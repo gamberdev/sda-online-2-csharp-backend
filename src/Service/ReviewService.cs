@@ -1,7 +1,8 @@
-using ecommerce.Models;
-using Microsoft.EntityFrameworkCore;
 using ecommerce.EntityFramework;
 using ecommerce.EntityFramework.Table;
+using ecommerce.Middleware;
+using ecommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.service;
 
@@ -46,29 +47,37 @@ public class ReviewService
         return newReview;
     }
 
-    public async Task<Review?> UpdateReview(Guid id, ReviewModel updateReview)
+    public async Task<Review?> UpdateReview(Guid id, ReviewModel updateData, Guid userId)
     {
-        var reviewsDb = await _appDbContext.Reviews.ToListAsync();
-        var foundReview = reviewsDb.FirstOrDefault(review => review.ReviewId == id);
-        if (foundReview != null)
+        var reviewToUpdate =
+            await _appDbContext.Reviews.FindAsync(id)
+            ?? throw new NotFoundException("The review was not found.");
+
+        // Check if the user is authorized to update the review
+        if (reviewToUpdate.UserId != userId)
         {
-            foundReview.Comment = updateReview.Comment;
+            throw new UnauthorizedAccessException("You are not authorized to update this review.");
         }
+        // Update the review data
+        reviewToUpdate.Comment = updateData.Comment;
+        // Save changes to the database
         await _appDbContext.SaveChangesAsync();
-        return foundReview;
+        return reviewToUpdate;
     }
 
-    public async Task<bool> DeleteReview(Guid id)
+    public async Task<bool> DeleteReview(Guid id, Guid userId)
     {
-        await Task.CompletedTask;
-        var reviewDb = await _appDbContext.Reviews.ToListAsync();
-        var foundReview = reviewDb.FirstOrDefault(review => review.ReviewId == id);
-        if (foundReview != null)
+        var reviewToDelete =
+            await _appDbContext.Reviews.FindAsync(id)
+            ?? throw new NotFoundException("The review was not found.");
+
+        // Check if the user is authorized to delete the review
+        if (reviewToDelete.UserId != userId)
         {
-            _appDbContext.Reviews.Remove(foundReview);
-            await _appDbContext.SaveChangesAsync();
-            return true;
+            throw new UnauthorizedAccessException("You are not authorized to delete this review.");
         }
-        return false;
+        _appDbContext.Reviews.Remove(reviewToDelete);
+        await _appDbContext.SaveChangesAsync();
+        return true;
     }
 }
