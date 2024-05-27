@@ -56,17 +56,13 @@ public class ProductController : ControllerBase
         switch (sortBy)
         {
             case SortBy.Name:
-                products =
-                    orderBy == OrderBy.ASC
-                        ? products.OrderBy(p => p.Name)
-                        : products.OrderByDescending(p => p.Name);
+                products = (orderBy == OrderBy.ASC) ? products.OrderBy(p => p.Name) : products.OrderByDescending(p => p.Name);
                 break;
-            default:
-                // Default sorting by date
-                products =
-                    orderBy == OrderBy.ASC
-                        ? products.OrderBy(p => p.CreatedAt)
-                        : products.OrderByDescending(p => p.CreatedAt);
+            case SortBy.Date:
+                products = (orderBy == OrderBy.ASC) ? products.OrderBy(p => p.CreatedAt) : products.OrderByDescending(p => p.CreatedAt);
+                break;
+            case SortBy.Price:
+                products = (orderBy == OrderBy.ASC) ? products.OrderBy(p => p.Price) : products.OrderByDescending(p => p.Price);
                 break;
         }
 
@@ -75,20 +71,32 @@ public class ProductController : ControllerBase
             return ApiResponse.NotFound("No products found matching the sort/filter criteria.");
         }
 
+        //calculate total pages
+        var totalProducts = products.Count();
+        var totalPages = (int)Math.Ceiling(totalProducts/(double)limit);
         // Apply pagination
         var paginatedProducts = products.Skip((page - 1) * limit).Take(limit).ToList();
+        // create  response object
+        var response = new
+        {
+            Products =paginatedProducts,
+            TotalPages = totalPages,
+            CurrentPage = page,
+            PageSize = limit,
+            TotalProducts = totalProducts
+        }; 
 
         return ApiResponse.Success(
-            paginatedProducts,
+            response,
             "All products inside E-commerce system are returned"
         );
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetProductById(Guid id)
+    [HttpGet("{slug}")]
+    public async Task<IActionResult> GetProductById(string slug)
     {
         var foundProduct =
-            await _productService.GetProductById(id)
+            await _productService.GetProductById(slug)
             ?? throw new NotFoundException("There is no product found matching");
 
         return ApiResponse.Success(foundProduct, "Product are returned successfully");

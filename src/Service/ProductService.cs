@@ -25,14 +25,14 @@ public class ProductService
         return products;
     }
 
-    // Get product by ID
-    public async Task<Product?> GetProductById(Guid id)
+    // Get product by Slug
+    public async Task<Product?> GetProductById(String slug)
     {
         var foundProduct = await _appDbContext
             .Products.Include(c => c.Category)
             .Include(r => r.Reviews)
             .Include(i => i.OrderItems)
-            .FirstOrDefaultAsync(product => product.ProductId == id);
+            .FirstOrDefaultAsync(product => product.Slug == slug);
         return foundProduct;
     }
 

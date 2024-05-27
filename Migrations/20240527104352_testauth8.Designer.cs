@@ -12,8 +12,8 @@ using ecommerce.EntityFramework;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240509123720_tables")]
-    partial class tables
+    [Migration("20240527104352_testauth8")]
+    partial class testauth8
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

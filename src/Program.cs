@@ -4,14 +4,23 @@ using ecommerce.EntityFramework;
 using ecommerce.Middleware;
 using ecommerce.service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
+// Get JWT settings from environment variables
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
 
+// Get the database connection string from environment variables
+var defaultConnection = Environment.GetEnvironmentVariable("DefaultConnection") ?? throw new InvalidOperationException("Default Connection is missing in environment variables.");
 var Configuration = builder.Configuration;
-var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]!);
+
+var key = Encoding.ASCII.GetBytes(jwtKey);
 builder
     .Services.AddAuthentication(options =>
     {
@@ -41,8 +50,9 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(defaultConnection)
 );
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -84,7 +94,16 @@ builder.Services.AddSwaggerGen(c =>
         }
     );
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", builder =>
+    {
+        builder.WithOrigins("http://localhost:3000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();// token
+    });
+});
 builder.Services.AddControllers();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
@@ -96,11 +115,11 @@ builder.Services.AddScoped<ProductService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-builder
-    .Services.AddControllers()
+builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
 var app = builder.Build();
@@ -116,6 +135,6 @@ app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+app.UseCors("AllowSpecificOrigin");
 // Run the application
 app.Run();

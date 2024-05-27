@@ -7,7 +7,9 @@ public enum OrderBy
 public enum SortBy
 {
     Name,
+    Price,
     Date
+
 }
 
 public enum OrderStatus

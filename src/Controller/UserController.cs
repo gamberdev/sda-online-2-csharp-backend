@@ -53,7 +53,7 @@ public class UserController : ControllerBase
     {
         var userSignIn = await _userService.SignIn(signInInfo);
         var token = _authService.GenerateJwt(userSignIn!);
-        Console.WriteLine($"{token}");
+       // Console.WriteLine($"{token}");
 
         return ApiResponse.Success(new { token, userSignIn }, "User is SignIn successfully");
     }
