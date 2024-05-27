@@ -101,6 +101,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(p => p.CategoryId) // Foreign key property in the Product entity
             .IsRequired(false); // CategoryId is required in Product entity
 
+
         //Relationship User & Review
         modelBuilder
             .Entity<User>()
