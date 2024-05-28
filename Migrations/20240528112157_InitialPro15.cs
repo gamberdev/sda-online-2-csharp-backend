@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPro3 : Migration
+    public partial class InitialPro15 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -47,13 +47,14 @@ namespace Backend.Migrations
                 columns: table => new
                 {
                     product_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    category_id = table.Column<Guid>(type: "uuid", nullable: true),
                     name = table.Column<string>(type: "text", nullable: false),
                     price = table.Column<double>(type: "double precision", nullable: false),
+                    quantity = table.Column<double>(type: "double precision", nullable: false),
                     slug = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     image = table.Column<string>(type: "text", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    category_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -76,7 +77,7 @@ namespace Backend.Migrations
                     delivery_address = table.Column<string>(type: "text", nullable: false),
                     payment_method = table.Column<string>(type: "text", nullable: false),
                     order_status = table.Column<int>(type: "integer", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    user_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -85,8 +86,7 @@ namespace Backend.Migrations
                         name: "FK_order_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "user_id");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,8 +95,8 @@ namespace Backend.Migrations
                 {
                     review_id = table.Column<Guid>(type: "uuid", nullable: false),
                     comment = table.Column<string>(type: "text", nullable: false),
-                    product_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    product_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -105,14 +105,12 @@ namespace Backend.Migrations
                         name: "FK_review_products_product_id",
                         column: x => x.product_id,
                         principalTable: "products",
-                        principalColumn: "product_id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "product_id");
                     table.ForeignKey(
                         name: "FK_review_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "user_id");
                 });
 
             migrationBuilder.CreateTable(

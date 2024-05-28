@@ -28,8 +28,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Category>().HasKey(category => category.CategoryId);
         modelBuilder.Entity<Review>().HasKey(review => review.ReviewId);
 
-        // Category Constraint
-        // Category Name
+        // // Category Constraint
+        // // Category Name
         modelBuilder.Entity<Category>().Property(category => category.Name).IsRequired();
         modelBuilder.Entity<Category>().HasIndex(category => category.Name).IsUnique();
         modelBuilder.Entity<Category>().HasIndex(category => category.Slug).IsUnique();
@@ -95,11 +95,11 @@ public class AppDbContext : DbContext
 
         // Configure one-to-many relationship between Product and Category
         modelBuilder
-            .Entity<Product>()
-            .HasOne(p => p.Category) // Each product belongs to one category
-            .WithMany(c => c.Product) // Each category can have many products
-            .HasForeignKey(p => p.CategoryId) // Foreign key property in the Product entity
-            .IsRequired(false); // CategoryId is required in Product entity
+        .Entity<Product>()
+        .HasOne(p => p.Category) // Each product belongs to one category
+        .WithMany(c => c.Product) // Each category can have many products
+        .HasForeignKey(p => p.CategoryId) // Foreign key property in the Product entity
+        .IsRequired(false); // CategoryId is required in Product entity
 
 
         //Relationship User & Review

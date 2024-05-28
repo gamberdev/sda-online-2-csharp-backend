@@ -15,8 +15,8 @@ CREATE TABLE users (
 
 CREATE TABLE category (
   category_id UUid PRIMARY KEY,
-  name VARCHAR(100) UNIQUE NOT NULL,
-  slug VARCHAR(100) UNIQUE NOT NULL
+  name VARCHAR(100),
+  slug VARCHAR(100) 
 );
 
 -- =======================================================================
@@ -24,7 +24,7 @@ CREATE TABLE category (
 CREATE TABLE product (
   product_id UUid PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  image VARCHAR(150), 
+  image VARCHAR(150),quantity NUMERIC(10,2),
   price NUMERIC(10, 2) NOT NULL,
   description TEXT,
   slug VARCHAR(100) UNIQUE NOT NULL,

@@ -7,7 +7,7 @@ namespace ecommerce.EntityFramework.Table;
 public class Order
 {
     [Column("order_id")]
-    public Guid OrderId { get; set; }
+    public Guid? OrderId { get; set; }
 
     [Column("total_price")]
     public double? TotalPrice { get; set; }
@@ -29,7 +29,7 @@ public class Order
 
     // Foreign Key
     [Column("user_id")]
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     // Navigation properties
     public User? User { get; set; }

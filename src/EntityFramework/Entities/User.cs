@@ -8,7 +8,7 @@ namespace ecommerce.EntityFramework.Table;
 public class User
 {
     [Column("user_id")]
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     [Column("full_name")]
     public string? FullName { get; set; }

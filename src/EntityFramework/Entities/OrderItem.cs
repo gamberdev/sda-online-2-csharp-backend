@@ -7,7 +7,7 @@ namespace ecommerce.EntityFramework.Table;
 public class OrderItem
 {
     [Column("orderItem_id")]
-    public Guid OrderItemId { get; set; }
+    public Guid? OrderItemId { get; set; }
 
     [Column("quantity")]
     public int Quantity { get; set; }
@@ -17,10 +17,10 @@ public class OrderItem
 
     //Foreign Key
     [Column("product_id")]
-    public Guid ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
     [Column("user_id")]
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     [Column("order_id")]
     public Guid? OrderId { get; set; }

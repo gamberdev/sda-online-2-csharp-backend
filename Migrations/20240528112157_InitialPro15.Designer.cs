@@ -12,8 +12,8 @@ using ecommerce.EntityFramework;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240527212417_InitialPro3")]
-    partial class InitialPro3
+    [Migration("20240528112157_InitialPro15")]
+    partial class InitialPro15
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("ecommerce.EntityFramework.Table.Order", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("order_id");
@@ -88,7 +88,7 @@ namespace Backend.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("total_price");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
@@ -101,7 +101,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("ecommerce.EntityFramework.Table.OrderItem", b =>
                 {
-                    b.Property<Guid>("OrderItemId")
+                    b.Property<Guid?>("OrderItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("orderItem_id");
@@ -114,7 +114,8 @@ namespace Backend.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("price");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
+                        .IsRequired()
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
 
@@ -122,7 +123,8 @@ namespace Backend.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
+                        .IsRequired()
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
@@ -139,7 +141,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("ecommerce.EntityFramework.Table.Product", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
@@ -172,6 +174,10 @@ namespace Backend.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("price");
 
+                    b.Property<double>("Quantity")
+                        .HasColumnType("double precision")
+                        .HasColumnName("quantity");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("text")
@@ -191,7 +197,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("ecommerce.EntityFramework.Table.Review", b =>
                 {
-                    b.Property<Guid>("ReviewId")
+                    b.Property<Guid?>("ReviewId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("review_id");
@@ -201,11 +207,11 @@ namespace Backend.Migrations
                         .HasColumnType("text")
                         .HasColumnName("comment");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
@@ -220,7 +226,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("ecommerce.EntityFramework.Table.User", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
@@ -276,9 +282,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("ecommerce.EntityFramework.Table.User", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -322,15 +326,11 @@ namespace Backend.Migrations
                 {
                     b.HasOne("ecommerce.EntityFramework.Table.Product", "Product")
                         .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("ecommerce.EntityFramework.Table.User", "User")
                         .WithMany("Reviews")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Product");
 
