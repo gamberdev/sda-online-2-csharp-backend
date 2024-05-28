@@ -20,7 +20,7 @@ namespace ecommerce.EntityFramework.Table
         public double Price { get; set; }
 
         [Column("quantity")]
-        public double Quantity { get; set; }  // Corrected to PascalCase for consistency
+        public double Quantity { get; set; } = 0;  // Corrected to PascalCase for consistency
 
         [Column("slug")]
         public string Slug { get; set; } = string.Empty;
