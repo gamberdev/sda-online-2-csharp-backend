@@ -14,6 +14,7 @@ public class ProductModel
     [Required(ErrorMessage = "Product Price is required")]
     [Range(0.01, 20000.00, ErrorMessage = "Price must be between 0.01 and 20000.00")]
     public double Price { get; set; }
+    public double quantity { get; set; }
     public string? Description { get; set; }
     public string? Image { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

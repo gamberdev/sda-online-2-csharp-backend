@@ -56,6 +56,7 @@ public class ProductService
             ProductId = Guid.NewGuid(),
             Name = newProduct.Name,
             Price = newProduct.Price,
+            Quantity=newProduct.quantity,
             Slug = Function.GetSlug(newProduct.Name ?? ""),
             Description = newProduct.Description,
             Image = newProduct.Image ?? "",
@@ -77,6 +78,7 @@ public class ProductService
         {
             foundProduct.Name = updatedProduct.Name ?? foundProduct.Name;
             foundProduct.Price = updatedProduct.Price;
+             foundProduct.Quantity = updatedProduct.quantity;
             foundProduct.Slug = Function.GetSlug(foundProduct.Name ?? "");
             foundProduct.Description = updatedProduct.Description ?? foundProduct.Description;
             foundProduct.Image = updatedProduct.Image ?? foundProduct.Image;
