@@ -52,25 +52,34 @@ public class ExceptionHandlingMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         _logger.LogInformation(
-            $"---- Exception Handling Requests: {context.Request.Method} {context.Request.Path} ----"
-        );
+         $"---- Handling Request: {context.Request.Method} {context.Request.Path} ----"
+     );
         try
         {
             await _next(context);
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Unhandled error occurred {ex}");
+            _logger.LogError($"Unhandled error occurred: {ex}");
 
-            var response = GetException(ex);
-            if (ex.InnerException is Npgsql.PostgresException postgresException)
+            var response = new { StatusCode = StatusCodes.Status500InternalServerError, Message = "An unexpected error occurred." };
+
+            if (ex is Npgsql.PostgresException postgresException)
             {
                 if (postgresException.SqlState == "23505")
                 {
-                    response.StatusCode = StatusCodes.Status409Conflict;
-                    response.Message = "Duplicate Data. DataInfo is already exist, try again!";
+                    response = new { StatusCode = StatusCodes.Status409Conflict, Message = "Duplicate Data. DataInfo already exists, try again!" };
+                }
+                else if (postgresException.SqlState == "XX000")
+                {
+                    response = new { StatusCode = StatusCodes.Status500InternalServerError, Message = ex.Message };
                 }
             }
+            else if (ex is ArgumentException argEx)
+            {
+                response = new { StatusCode = StatusCodes.Status400BadRequest, Message = argEx.Message };
+            }
+
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = response.StatusCode;
 
@@ -80,7 +89,7 @@ public class ExceptionHandlingMiddleware
         finally
         {
             _logger.LogInformation(
-                $"---- End Handling Requests: {context.Request.Method} {context.Request.Path} ----"
+                $"---- End Handling Request: {context.Request.Method} {context.Request.Path} ----"
             );
         }
     }

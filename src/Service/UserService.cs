@@ -70,23 +70,32 @@ public class UserService
 
     public async Task<UserViewModel> CreateAccount(UserModel newUser)
     {
-        Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
-        User user = new User
+        try
         {
-            UserId = Guid.NewGuid(),
-            FullName = newUser.FullName,
-            Email = newUser.Email,
-            Phone = newUser.Phone,
-            Password = newUser.Password,
-            CreatedAt = DateTime.UtcNow,
-            Role = userRole
-        };
-        //hash the password
-        user.Password = _passwordHasher.HashPassword(user, user.Password!);
-        await _appDbContext.Users.AddAsync(user);
-        await _appDbContext.SaveChangesAsync();
-        var userDisplay = _mapper.Map<UserViewModel>(user);
-        return userDisplay;
+            Role userRole = newUser.Role == Role.Customer ? Role.Customer : Role.Admin;
+            User user = new User
+            {
+                UserId = Guid.NewGuid(),
+                FullName = newUser.FullName,
+                Email = newUser.Email,
+                Phone = newUser.Phone,
+                Password = newUser.Password,
+                CreatedAt = DateTime.UtcNow,
+                Role = userRole
+            };
+            //hash the password
+            user.Password = _passwordHasher.HashPassword(user, user.Password!);
+            await _appDbContext.Users.AddAsync(user);
+            await _appDbContext.SaveChangesAsync();
+            var userDisplay = _mapper.Map<UserViewModel>(user);
+            return userDisplay;
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+
     }
 
     public async Task<UserViewModel?> UpdateUser(Guid id, UserModel updateUser)
