@@ -12,8 +12,8 @@ using ecommerce.EntityFramework;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240530072549_newappdb8")]
-    partial class newappdb8
+    [Migration("20240603102527_newappdb19")]
+    partial class newappdb19
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

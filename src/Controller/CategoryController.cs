@@ -24,10 +24,10 @@ public class CategoryController : ControllerBase
     public async Task<IActionResult> GetCategories()
     {
         var categories = await _categoryService.GetCategories();
-        if (!categories.Any())
-        {
-            throw new NotFoundException("There is no categories found");
-        }
+        // if (!categories.Any())
+        // {
+        //     throw new NotFoundException("There is no categories found");
+        // }
 
         return ApiResponse.Success(
             categories,

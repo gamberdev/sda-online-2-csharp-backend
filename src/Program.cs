@@ -4,34 +4,29 @@ using ecommerce.EntityFramework;
 using ecommerce.Middleware;
 using ecommerce.service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
-DotNetEnv.Env.Load();
-// Get JWT settings from environment variables
 
-
-var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
-var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
-var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
-
-var DefaultConnection = Environment.GetEnvironmentVariable("DefaultConnection") ?? throw new InvalidOperationException("Default Connection is missing in environment variables.");
-var Configuration = builder.Configuration;
-
+const string jwtKey = "hello_this_is_my_secret_key234uu5688er6";
+const string jwtIssuer = "http://localhost:5125";
+const string jwtAudience = "http://localhost:5125";
+const string defaultConnection =
+    // "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres;";
+    //  User Id=postgres.wpxkodjrifgbbzkjbtry;Password=[YOUR-PASSWORD];Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres;
+        "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Port=5432;Database=postgres;";
+// Configure JWT authentication
 var key = Encoding.ASCII.GetBytes(jwtKey);
-builder
-    .Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; // set this one as a true in production
+        options.RequireHttpsMetadata = false; // Set this to true in production
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -39,22 +34,18 @@ builder
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidIssuer = Configuration["Jwt:Issuer"],
-            ValidAudience = Configuration["Jwt:Audience"],
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             ClockSkew = TimeSpan.Zero
         };
     });
 
-// claim-based for banned user
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequiredNotBanned", policy => policy.RequireClaim("IsBanned", "false"));
-});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequiredNotBanned", policy => policy.RequireClaim("IsBanned", "false"));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(DefaultConnection)
+    options.UseNpgsql(defaultConnection)
 );
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -78,7 +69,6 @@ builder.Services.AddSwaggerGen(c =>
             Scheme = "bearer"
         }
     );
-
     c.AddSecurityRequirement(
         new OpenApiSecurityRequirement
         {
@@ -96,16 +86,18 @@ builder.Services.AddSwaggerGen(c =>
         }
     );
 });
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", builder =>
+    options.AddPolicy("AllowSpecificOrigin", policyBuilder =>
     {
-        builder.WithOrigins("http://localhost:3000")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();// token
+        policyBuilder.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
@@ -126,21 +118,20 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    });
-
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
 }
 
-app.MapControllers().WithParameterValidation();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("AllowSpecificOrigin");
-// Run the application
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers().WithParameterValidation();
+
 app.Run();
