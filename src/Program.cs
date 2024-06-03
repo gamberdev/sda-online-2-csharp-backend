@@ -13,10 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 const string jwtKey = "hello_this_is_my_secret_key234uu5688er6";
 const string jwtIssuer = "http://localhost:5125";
 const string jwtAudience = "http://localhost:5125";
-const string defaultConnection =
-    // "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres;";
-    //  User Id=postgres.wpxkodjrifgbbzkjbtry;Password=[YOUR-PASSWORD];Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres;
-        "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Port=5432;Database=postgres;";
+const string defaultConnection = "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Pomrt=5432;Database=postgres;";
 // Configure JWT authentication
 var key = Encoding.ASCII.GetBytes(jwtKey);
 builder.Services.AddAuthentication(options =>
@@ -98,6 +95,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
@@ -123,6 +121,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
 }
+app.MapGet("/", () =>
+{
+    return "Welcome to Ecommerce API";
+}).WithOpenApi();
+
 
 app.UseHttpsRedirection();
 
