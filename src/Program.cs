@@ -10,11 +10,16 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string jwtKey = "hello_this_is_my_secret_key234uu5688er6";
-const string jwtIssuer = "http://localhost:5125";
-const string jwtAudience = "http://localhost:5125";
-const string defaultConnection = "User Id=postgres.wpxkodjrifgbbzkjbtry;Password=Sv*0504997836;Server=aws-0-eu-central-1.pooler.supabase.com;Pomrt=5432;Database=postgres;";
-// Configure JWT authentication
+DotNetEnv.Env.Load();
+
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
+
+// Get the database connection string from environment variables
+var defaultConnection = Environment.GetEnvironmentVariable("DefaultConnection") ?? throw new InvalidOperationException("Default Connection is missing in environment variables.");
+
+
 var key = Encoding.ASCII.GetBytes(jwtKey);
 builder.Services.AddAuthentication(options =>
     {
