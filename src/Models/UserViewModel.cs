@@ -2,7 +2,7 @@ namespace ecommerce.Models;
 
 public class UserViewModel
 {
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     public string? FullName { get; set; }
 
